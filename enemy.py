@@ -23,11 +23,11 @@ def main():
         if startFlag:
             last_move = readMoves('first_four_moves')
             if last_move[0] == "enemy":
-                Pnum = 1
-                Enum = 2
-            else:
                 Pnum = 2
                 Enum = 1
+            else:
+                Pnum = 1
+                Enum = 2
             if os.path.getsize("move_file") != 0:
                 last_move = readMoves("move_file")
         else:
