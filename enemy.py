@@ -8,7 +8,7 @@ import random
 import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
-complete_boards = []
+complete_boards = [0,0,0,0,0,0,0,0]
 Pnum = 0
 Enum = 0
 # lol
@@ -50,8 +50,10 @@ def readMoves(file):
             moves = line.split()
             if moves[0] == 'enemy':
                 board[int(moves[1])][int(moves[2])] = Pnum
+                checkBoardComplete(int(moves[1]))
             else:
                 board[int(moves[1])][int(moves[2])] = Enum
+                checkBoardComplete(int(moves[1]))
     f.close()
     return last_move
 
@@ -64,9 +66,8 @@ def findNextMove(last_move):
     if last_move in complete_boards:
         last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
     for i in range(0, 8):
-        #if board[last_move][i] == Enum or board[last_move][i] == Pnum:
+        #    if board[last_move][i] == Enum or board[last_move][i] == Pnum:
         #    takenList.append(board[last_move][i])
-
         if board[last_move][i] == 0:
             availableList.append(i)
     #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
@@ -78,31 +79,54 @@ def findNextMove(last_move):
 
 def checkBoardComplete(g_board):
     # checks 3 in a row
-    if board[g_board][0:3] == [1, 1, 1] or [2, 2, 2]:
+    if board[g_board][0:3] == [1, 1, 1]:
         print("row 1")
-        complete_boards.append(g_board)
-    elif board[g_board][3:6] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif board[g_board][3:6] == [1, 1, 1]:
         print("row 2")
-        complete_boards.append(g_board)
-    elif board[g_board][6:9] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif board[g_board][6:9] == [1, 1, 1]:
         print("row 3")
-        complete_boards.append(g_board)
-    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [1, 1, 1]:
         print("column 1")
-        complete_boards.append(g_board)
-    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [1, 1, 1]:
         print('column 2')
-        complete_boards.append(g_board)
-    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [1, 1, 1]:
         print('column 3')
-        complete_boards.append(g_board)
-    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [1, 1, 1]:
         print('diagonal 1')
-        complete_boards.append(g_board)
-    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards[g_board] = 1
+    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [1, 1, 1]:
         print('diagonal 2')
-    # checks all filled
-    # add to list of complete boards
+        complete_boards[g_board] = 1
+    elif board[g_board][0:3] == [2, 2, 2]:
+        print("row 1")
+        complete_boards[g_board] = 2
+    elif board[g_board][3:6] == [2, 2, 2]:
+        print("row 2")
+        complete_boards[g_board] = 2
+    elif board[g_board][6:9] == [2, 2, 2]:
+        print("row 3")
+        complete_boards[g_board] = 2
+    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [2, 2, 2]:
+        print("column 1")
+        complete_boards[g_board] = 2
+    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [2, 2, 2]:
+        print('column 2')
+        complete_boards[g_board] = 2
+    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [2, 2, 2]:
+        print('column 3')
+        complete_boards[g_board] = 2
+    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [2, 2, 2]:
+        print('diagonal 1')
+        complete_boards[g_board] = 2
+    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [2, 2, 2]:
+        print('diagonal 2')
+        complete_boards[g_board] = 2
 
 
 def addMove(next_move, last_move):
