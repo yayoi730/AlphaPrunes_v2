@@ -61,12 +61,18 @@ def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
     takenList = []
+    availableList = []
     if last_move in complete_boards:
         last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
     for i in range(0, 8):
-        if board[last_move][i] == Pnum or board[last_move][i] == Enum:
-            takenList.append(board[last_move][i])
-    move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+        #if board[last_move][i] == Pnum or board[last_move][i] == Enum:
+            #takenList.append(board[last_move][i])
+        #    takenList.append(i)
+        if board[last_move][i] == 0:
+            availableList.append(i)
+
+    #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+    move = [last_move, random.choice(availableList)]
     return move
 
 
