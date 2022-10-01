@@ -5,7 +5,6 @@ import time
 
 import numpy as np
 import random
-
 import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
@@ -35,8 +34,6 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
-    os.remove("enemy.go")
-    os.remove("end_game")
 
 
 def readMoves(file):
@@ -66,8 +63,8 @@ def findNextMove(last_move):
     if last_move in complete_boards:
         last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
     for i in range(0, 8):
-        if board[last_move][i] == 1 or board[last_move][i] == Pnum:
-            takenList.append(i)
+        if board[last_move][i] == Enum or board[last_move][i] == Pnum:
+            takenList.append(board[last_move][i])
     move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     print("Chosen Move: " + str(move))
     print("Taken List: " + str(takenList))
