@@ -27,8 +27,6 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
-    os.remove("AlphaPrunes.go")
-    os.remove("end_game")
 
 
 def readMoves(file):
@@ -59,7 +57,7 @@ def findNextMove(last_move):
         last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
     for i in range(0, 8):
         if board[last_move][i] == 1 or board[last_move][i] == 2:
-            takenList.append(board[last_move][i])
+            takenList.append(i)
     move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     print("Chosen Move: " + str(move))
     print("Taken List: " + str(takenList))
