@@ -90,6 +90,10 @@ def checkBoardComplete(g_board):
         print('column 2')
     elif board[g_board][:, 3] == [1, 1, 1] or [2, 2, 2]:
         print('column 3')
+    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [1, 1, 1] or [2, 2, 2]:
+        print('diagnol 1')
+    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
+        print('diagnol 2')
     # checks all filled
     # add to list of complete boards
 
@@ -154,6 +158,8 @@ def display():
     print(str(board[6][0:3]) + " | " + str(board[7][0:3]) + " | " + str(board[8][0:3]))
     print(str(board[6][3:6]) + " | " + str(board[7][3:6]) + " | " + str(board[8][3:6]))
     print(str(board[6][6:9]) + " | " + str(board[7][6:9]) + " | " + str(board[8][6:9]))
+
+
 
 
 if __name__ == "__main__":
