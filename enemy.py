@@ -10,6 +10,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = []
+Pnum = 0
+Enum = 0
 # lol
 
 def main():
@@ -20,6 +22,12 @@ def main():
             pass
         if startFlag:
             last_move = readMoves('first_four_moves')
+            if last_move[0] == "enemy":
+                Pnum = 1
+                Enum = 2
+            else:
+                Pnum = 2
+                Enum = 1
             if os.path.getsize("move_file") != 0:
                 last_move = readMoves("move_file")
         else:
@@ -27,6 +35,8 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
+    os.remove("enemy.go")
+    os.remove("end_game")
 
 
 def readMoves(file):
@@ -42,9 +52,9 @@ def readMoves(file):
             # populates matrices
             moves = line.split()
             if moves[0] == 'enemy':
-                board[int(moves[1])][int(moves[2])] = 1
+                board[int(moves[1])][int(moves[2])] = Pnum
             else:
-                board[int(moves[1])][int(moves[2])] = 2
+                board[int(moves[1])][int(moves[2])] = Enum
     f.close()
     return last_move
 
@@ -56,8 +66,8 @@ def findNextMove(last_move):
     if last_move in complete_boards:
         last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
     for i in range(0, 8):
-        if board[last_move][i] == 1 or board[last_move][i] == 2:
-            takenList.append(i)
+        if board[last_move][i] == 1 or board[last_move][i] == Pnum:
+            takenList.append(board[last_move][i])
     move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     print("Chosen Move: " + str(move))
     print("Taken List: " + str(takenList))
@@ -87,7 +97,7 @@ def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     f = open("move_file", "r+")
     f.truncate(0)
-    board[int(next_move[0])][int(next_move[1])] = 1
+    board[int(next_move[0])][int(next_move[1])] = Pnum
     f.write("enemy " + str(next_move[0]) + " " + str(next_move[1]))
 
     f.close()
