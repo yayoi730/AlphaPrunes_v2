@@ -1,3 +1,4 @@
+import math
 import os
 from os.path import exists
 import time
@@ -7,8 +8,10 @@ import random
 
 import pygame
 
-board = np.zeros((9, 9)) # stores the moves that have been played
+board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = []
+
+
 def main():
     startFlag = True
     while not exists("end_game"):
@@ -26,6 +29,8 @@ def main():
         startFlag = False
     os.remove("AlphaPrunes1.go")
     os.remove("end_game")
+
+
 def readMoves(file):
     # reads in txt file and populates the board with the move information
     # returns the last move made in a list ex: ['X'. '1' '2']
@@ -39,11 +44,11 @@ def readMoves(file):
             # populates matrices
             moves = line.split()
             if moves[0] == 'AlphaPrunes1' or 'O':
-                board[int(moves[1])][int(moves[2])] = 1 # X = 1
+                board[int(moves[1])][int(moves[2])] = 1  # X = 1
             else:
                 board[int(moves[1])][int(moves[2])] = 2  # O = 2
     f.close()
-    print(board[:,1])
+    print(board[:, 1])
     return last_move
 
 
@@ -59,6 +64,7 @@ def findNextMove(last_move):
     move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     return move
 
+
 def checkBoardComplete(g_board):
     # checks 3 in a row
     if board[g_board][0:3] == [1, 1, 1] or [2, 2, 2]:
@@ -67,15 +73,16 @@ def checkBoardComplete(g_board):
         print("row 2")
     elif board[g_board][6:9] == [1, 1, 1] or [2, 2, 2]:
         print("row 3")
-    elif board[g_board][0,3,6] == [1, 1, 1] or [2, 2, 2]:
+    elif board[g_board][0, 3, 6] == [1, 1, 1] or [2, 2, 2]:
         print("column 1")
-        print(board[g_board][:,1])
-    elif board[g_board][:,2] == [1, 1, 1] or [2, 2, 2]:
+        print(board[g_board][:, 1])
+    elif board[g_board][:, 2] == [1, 1, 1] or [2, 2, 2]:
         print('column 2')
-    elif board[g_board][:,3] == [1, 1, 1] or [2, 2, 2]:
+    elif board[g_board][:, 3] == [1, 1, 1] or [2, 2, 2]:
         print('column 3')
     # checks all filled
     # add to list of compelete boards
+
 
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
@@ -89,6 +96,42 @@ def addMove(next_move, last_move):
         f.write("AlphaPrunes1 " + str(next_move[0]) + " " + str(next_move[1]))
     f.close()
     display()
+
+
+def minimax(g_board, depth, alpha, beta, ally):
+    # miniMax function with Alpha-Beta Pruning implemented
+    if depth == 0:
+        return pointswon(g_board)  # checks the number of points won
+    if ally:
+        max_eval = -math.inf
+        for possible_move in g_board:
+            eval = minimax(possible_move, depth - 1, alpha, beta, not ally)
+            max_eval = max(max_eval, eval)
+            """
+            alpha = max(alpha, eval)
+            if beta <= alpha
+                break
+            """
+        return max_eval
+    else:
+        min_eval = math.inf
+        for possible_move in g_board:
+            eval = minimax(possible_move, depth - 1, alpha, beta, ally)
+            min_eval = min(min_eval, eval)
+            """
+            beta = min(beta, eval)
+            if beta <= alpha
+            break
+            """
+        return min_eval
+
+
+def pointswon(g_board):
+    # static evaluation (utility) function that returns number of points won by Player
+
+    # check
+    return 1
+
 
 def display():
     # function that can be called to display the current state of the board
