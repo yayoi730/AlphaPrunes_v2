@@ -10,7 +10,7 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = []
-
+# lol
 
 def main():
     startFlag = True

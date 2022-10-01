@@ -74,10 +74,10 @@ def checkBoardComplete(g_board):
         print("row 2")
     elif board[g_board][6:9] == [1, 1, 1] or [2, 2, 2]:
         print("row 3")
-    elif board[g_board][0, 3, 6] == [1, 1, 1] or [2, 2, 2]:
+    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
         print("column 1")
         print(board[g_board][:, 1])
-    elif board[g_board][:, 2] == [1, 1, 1] or [2, 2, 2]:
+    elif [board[g_board][0], board[g_board][3], board[g_board][7]] == [1, 1, 1] or [2, 2, 2]:
         print('column 2')
     elif board[g_board][:, 3] == [1, 1, 1] or [2, 2, 2]:
         print('column 3')
