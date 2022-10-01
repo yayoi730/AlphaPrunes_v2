@@ -80,21 +80,27 @@ def checkBoardComplete(g_board):
     # checks 3 in a row
     if board[g_board][0:3] == [1, 1, 1] or [2, 2, 2]:
         print("row 1")
+        complete_boards.append(g_board)
     elif board[g_board][3:6] == [1, 1, 1] or [2, 2, 2]:
         print("row 2")
+        complete_boards.append(g_board)
     elif board[g_board][6:9] == [1, 1, 1] or [2, 2, 2]:
         print("row 3")
-    elif board[g_board][0, 3, 6] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards.append(g_board)
+    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
         print("column 1")
-        print(board[g_board][:, 1])
-    elif board[g_board][:, 2] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards.append(g_board)
+    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [1, 1, 1] or [2, 2, 2]:
         print('column 2')
-    elif board[g_board][:, 3] == [1, 1, 1] or [2, 2, 2]:
+        complete_boards.append(g_board)
+    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [1, 1, 1] or [2, 2, 2]:
         print('column 3')
+        complete_boards.append(g_board)
     elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [1, 1, 1] or [2, 2, 2]:
-        print('diagnol 1')
+        print('diagonal 1')
+        complete_boards.append(g_board)
     elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [1, 1, 1] or [2, 2, 2]:
-        print('diagnol 2')
+        print('diagonal 2')
     # checks all filled
     # add to list of complete boards
 
