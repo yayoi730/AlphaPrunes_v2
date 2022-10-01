@@ -56,7 +56,6 @@ def readMoves(file):
     f.close()
     return last_move
 
-
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
