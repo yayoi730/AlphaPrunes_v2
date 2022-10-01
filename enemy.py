@@ -16,7 +16,7 @@ def main():
     startFlag = True
     while not exists("end_game"):
         time.sleep(1)
-        while not exists("AlphaPrunes.go"):
+        while not exists("enemy.go"):
             pass
         if startFlag:
             last_move = readMoves('first_four_moves')
@@ -27,7 +27,7 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
-    os.remove("AlphaPrunes.go")
+    os.remove("enemy.go")
     os.remove("end_game")
 
 
@@ -43,7 +43,7 @@ def readMoves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'AlphaPrunes':
+            if moves[0] == 'enemy':
                 board[int(moves[1])][int(moves[2])] = 1
             else:
                 board[int(moves[1])][int(moves[2])] = 2
@@ -90,7 +90,8 @@ def addMove(next_move, last_move):
     f = open("move_file", "r+")
     f.truncate(0)
     board[int(next_move[0])][int(next_move[1])] = 1
-    f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    f.write("enemy " + str(next_move[0]) + " " + str(next_move[1]))
+
     f.close()
     display()
 
