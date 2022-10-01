@@ -16,7 +16,7 @@ def main():
     startFlag = True
     while not exists("end_game"):
         time.sleep(1)
-        while not exists("AlphaPrunes1.go"):
+        while not exists("AlphaPrunes.go"):
             pass
         if startFlag:
             last_move = readMoves('first_four_moves')
@@ -27,7 +27,7 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
-    os.remove("AlphaPrunes1.go")
+    os.remove("AlphaPrunes.go")
     os.remove("end_game")
 
 
@@ -43,7 +43,7 @@ def readMoves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'AlphaPrunes1' or 'O':
+            if moves[0] == 'AlphaPrunes':
                 board[int(moves[1])][int(moves[2])] = 1  # X = 1
             else:
                 board[int(moves[1])][int(moves[2])] = 2  # O = 2
@@ -81,19 +81,19 @@ def checkBoardComplete(g_board):
     elif board[g_board][:, 3] == [1, 1, 1] or [2, 2, 2]:
         print('column 3')
     # checks all filled
-    # add to list of compelete boards
+    # add to list of complete boards
 
 
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     f = open("move_file", "r+")
     f.truncate(0)
-    if last_move[0] == "AlphaPrunes1":
+    if last_move[0] == "AlphaPrunes":
         board[int(next_move[0])][int(next_move[1])] = 2
-        f.write("AlphaPrunes1 " + str(next_move[0]) + " " + str(next_move[1]))
+        f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     else:
         board[int(next_move[0])][int(next_move[1])] = 1
-        f.write("AlphaPrunes1 " + str(next_move[0]) + " " + str(next_move[1]))
+        f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     f.close()
     display()
 
