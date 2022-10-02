@@ -66,7 +66,7 @@ def findNextMove(last_move):
     availableList = []
     availableBoards = []
     for i in range(0, 9):
-        if (complete_boards[i] == 0):
+        if complete_boards[i] == 0:
             availableBoards.append(i)
 
     if complete_boards[last_move] != 0:
