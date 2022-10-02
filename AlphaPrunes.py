@@ -11,8 +11,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = [0,0,0,0,0,0,0,0,0]
-Pnum = 0
-Enum = 0
+Pnum = 4
+Enum = 4
 
 def main():
     startFlag = True
@@ -28,9 +28,11 @@ def main():
             if last_move[0] == "AlphaPrunes":
                 Pnum = 2
                 Enum = 1
+                last_move = readMoves('first_four_moves')
             else:
                 Pnum = 1
                 Enum = 2
+                last_move = readMoves('first_four_moves')
             if os.path.getsize("move_file") != 0:
                 last_move = readMoves("move_file")
         else:
@@ -149,6 +151,7 @@ def addMove(next_move, last_move):
     f.truncate(0)
     board[int(next_move[0])][int(next_move[1])] = Pnum
     f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    print("moved made: AlphaPrunes " + str(next_move[0])+ " " + str(next_move[1]))
     f.close()
     display()
 

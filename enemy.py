@@ -9,8 +9,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = [0,0,0,0,0,0,0,0,0]
-Pnum = 0
-Enum = 0
+Pnum = 4
+Enum = 4
 # lol
 
 def main():
@@ -26,9 +26,11 @@ def main():
             if last_move[0] == "enemy":
                 Pnum = 2
                 Enum = 1
+                last_move = readMoves('first_four_moves')
             else:
                 Pnum = 1
                 Enum = 2
+                last_move = readMoves('first_four_moves')
             if os.path.getsize("move_file") != 0:
                 last_move = readMoves("move_file")
         else:
@@ -45,17 +47,14 @@ def readMoves(file):
     lines = f.readlines()
     for line in lines:
         last_move = line.split()
-        if line.isspace():
-            break
+        # populates matrices
+        moves = line.split()
+        if moves[0] == 'enemy':
+           board[int(moves[1])][int(moves[2])] = Pnum
+           checkBoardComplete(int(moves[1]))
         else:
-            # populates matrices
-            moves = line.split()
-            if moves[0] == 'enemy':
-                board[int(moves[1])][int(moves[2])] = Pnum
-                checkBoardComplete(int(moves[1]))
-            else:
-                board[int(moves[1])][int(moves[2])] = Enum
-                checkBoardComplete(int(moves[1]))
+           board[int(moves[1])][int(moves[2])] = Enum
+           checkBoardComplete(int(moves[1]))
     f.close()
     return last_move
 
@@ -147,7 +146,7 @@ def addMove(next_move, last_move):
     f.truncate(0)
     board[int(next_move[0])][int(next_move[1])] = Pnum
     f.write("enemy " + str(next_move[0]) + " " + str(next_move[1]))
-
+    print("moved made: enemy " + str(next_move[0]) + " " + str(next_move[1]))
     f.close()
     display()
 
