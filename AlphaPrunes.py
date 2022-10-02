@@ -20,6 +20,7 @@ def main():
         time.sleep(1)
         while not exists("AlphaPrunes.go"):
             pass
+        time.sleep(1)
         if startFlag:
             last_move = readMoves('first_four_moves')
             print("This is last moves " + last_move[0])
@@ -150,6 +151,7 @@ def addMove(next_move, last_move):
     f = open("move_file", "r+")
     f.truncate(0)
     board[int(next_move[0])][int(next_move[1])] = Pnum
+    checkBoardComplete(next_move[0])
     f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     print("moved made: AlphaPrunes " + str(next_move[0])+ " " + str(next_move[1]))
     f.close()
