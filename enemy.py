@@ -8,7 +8,7 @@ import random
 import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
-complete_boards = [0,0,0,0,0,0,0,0]
+complete_boards = [0,0,0,0,0,0,0,0,0]
 Pnum = 0
 Enum = 0
 # lol
@@ -79,54 +79,60 @@ def findNextMove(last_move):
 
 def checkBoardComplete(g_board):
     # checks 3 in a row
-    if board[g_board][0:3] == [1, 1, 1]:
+    a = board[g_board][:]
+    print(str(board[g_board][0:3]))
+    if np.array_equal(board[g_board][0:3],[1., 1., 1]):
         print("row 1")
         complete_boards[g_board] = 1
-    elif board[g_board][3:6] == [1, 1, 1]:
+    elif np.array_equal(board[g_board][3:6],[1, 1, 1]):
         print("row 2")
         complete_boards[g_board] = 1
-    elif board[g_board][6:9] == [1, 1, 1]:
+    elif np.array_equal(board[g_board][6:9],[1, 1, 1]):
         print("row 3")
         complete_boards[g_board] = 1
-    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [1, 1, 1]:
+    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [1, 1, 1]):
         print("column 1")
         complete_boards[g_board] = 1
-    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [1, 1, 1]:
+    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [1, 1, 1]):
         print('column 2')
         complete_boards[g_board] = 1
-    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [1, 1, 1]:
+    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [1, 1, 1]):
         print('column 3')
         complete_boards[g_board] = 1
-    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [1, 1, 1]:
+    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [1, 1, 1]):
         print('diagonal 1')
         complete_boards[g_board] = 1
-    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [1, 1, 1]:
+    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [1, 1, 1]):
         print('diagonal 2')
         complete_boards[g_board] = 1
-    elif board[g_board][0:3] == [2, 2, 2]:
+    elif np.array_equal(board[g_board][0:3],[2, 2, 2]):
         print("row 1")
         complete_boards[g_board] = 2
-    elif board[g_board][3:6] == [2, 2, 2]:
+    elif np.array_equal(board[g_board][3:6], [2, 2, 2]):
         print("row 2")
         complete_boards[g_board] = 2
-    elif board[g_board][6:9] == [2, 2, 2]:
+    elif np.array_equal(board[g_board][6:9],[2, 2, 2]):
         print("row 3")
         complete_boards[g_board] = 2
-    elif [board[g_board][0], board[g_board][3], board[g_board][6]] == [2, 2, 2]:
+    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]],[2, 2, 2]):
         print("column 1")
         complete_boards[g_board] = 2
-    elif [board[g_board][1], board[g_board][4], board[g_board][7]] == [2, 2, 2]:
+    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]],[2, 2, 2]):
         print('column 2')
         complete_boards[g_board] = 2
-    elif [board[g_board][2], board[g_board][5], board[g_board][8]] == [2, 2, 2]:
+    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]],[2, 2, 2]):
         print('column 3')
         complete_boards[g_board] = 2
-    elif [board[g_board][0], board[g_board][4], board[g_board][8]] == [2, 2, 2]:
+    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]],[2, 2, 2]):
         print('diagonal 1')
         complete_boards[g_board] = 2
-    elif [board[g_board][2], board[g_board][4], board[g_board][6]] == [2, 2, 2]:
+    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]],[2, 2, 2]):
         print('diagonal 2')
         complete_boards[g_board] = 2
+    elif a.all:
+        # returns true if and only if every value isn't zero in the array
+        complete_boards[g_board] = 3
+        print('tied')
 
 
 def addMove(next_move, last_move):
