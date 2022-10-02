@@ -128,7 +128,7 @@ def checkBoardComplete(g_board):
     elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]],[2, 2, 2]):
         print('diagonal 2')
         complete_boards[g_board] = 2
-    elif a.all:
+    elif all(a):
         # returns true if and only if every value isn't zero in the array
         complete_boards[g_board] = 3
         print('tied')
