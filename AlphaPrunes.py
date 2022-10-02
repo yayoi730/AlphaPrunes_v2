@@ -22,6 +22,9 @@ def main():
             pass
         if startFlag:
             last_move = readMoves('first_four_moves')
+            print("This is last moves " + last_move[0])
+            global Pnum
+            global Enum
             if last_move[0] == "AlphaPrunes":
                 Pnum = 2
                 Enum = 1
@@ -61,17 +64,21 @@ def readMoves(file):
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
-    takenList = []
     availableList = []
-    if last_move in complete_boards:
-        last_move = random.choice([i for i in range(0, 8) if i not in complete_boards])
+    availableBoards = []
     for i in range(0, 9):
-        #  if board[last_move][i] == Pnum or board[last_move][i] == Enum:
-        #  takenList.append(board[last_move][i])
-        #  takenList.append(i)
+        if (complete_boards[i] == 0):
+            availableBoards.append(i)
+    if complete_boards[last_move] != 0:
+        last_move = random.choice(availableBoards)
+    for i in range(0, 9):
+        #if board[last_move][i] == Pnum or board[last_move][i] == Enum:
+        #takenList.append(board[last_move][i])
+        #    takenList.append(i)
         if board[last_move][i] == 0:
             availableList.append(i)
     #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+    print(str(availableList))
     move = [last_move, random.choice(availableList)]
     return move
 
