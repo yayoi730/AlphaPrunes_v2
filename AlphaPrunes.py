@@ -71,6 +71,7 @@ def findNextMove(last_move):
             availableBoards.append(i)
     if complete_boards[last_move] != 0:
         last_move = random.choice(availableBoards)
+        print("Changed To: " + str(last_move))
     for i in range(0, 9):
         #if board[last_move][i] == Pnum or board[last_move][i] == Enum:
         #takenList.append(board[last_move][i])
@@ -78,8 +79,9 @@ def findNextMove(last_move):
         if board[last_move][i] == 0:
             availableList.append(i)
     #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
-    print(str(availableList))
     move = [last_move, random.choice(availableList)]
+    print("Last Move: " + str(last_move))
+    print("Chosen Move: " + str(move))
     return move
 
 
