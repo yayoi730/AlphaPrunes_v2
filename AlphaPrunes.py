@@ -68,10 +68,10 @@ def readMoves(file):
             moves = line.split()
             if moves[0] == 'AlphaPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
-                checkBoardComplete(int(moves[1]), complete_boards)
+                checkBoardComplete(int(moves[1]), complete_boards, board)
             else:
                 board[int(moves[1])][int(moves[2])] = Enum
-                checkBoardComplete(int(moves[1]), complete_boards)
+                checkBoardComplete(int(moves[1]), complete_boards, board)
     f.close()
     return last_move
 
@@ -101,13 +101,13 @@ def findNextMove(last_move):
     return move
 
 
-def checkBoardComplete(g_board, c_boards):
+def checkBoardComplete(g_board, c_boards, a_board):
     """
     Checks whether a board has been complete after a move and updates the global complete_boards list
     :param g_board: takes in a index that corresponds to a 3x3 cell
-    :return:
+    :return: list of complete boards where 0 = incomplete, Pnum = complete
     """
-    arr = board[g_board][:]
+    arr = a_board[g_board][:]
     a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
     # check rows
     if (a[0] == Pnum).sum() == 3 or (a[0] == Enum).sum() == 3:
@@ -161,7 +161,7 @@ def checkBoardComplete(g_board, c_boards):
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     board[int(next_move[0])][int(next_move[1])] = Pnum
-    checkBoardComplete(next_move[0], complete_boards)
+    checkBoardComplete(next_move[0], complete_boards, board)
     f = open("move_file", "r+")
     f.truncate(0)
     f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
@@ -206,29 +206,10 @@ def won_board_points(c_boards):
     points_sum = 0
     a = np.where(Pnum, c_boards)
     return points_sum
-def points_won(temp_board):
-    """
-    # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
-    global board
-    :param g_board: temporary global board
-    :return: points_sum: total points won by the Pnum (Player)
-    """
+
+def two_in_row(incomplete_boards, temp_board, board):
     point_sum = 0
-    # sum points of won boards
-    # TODO: determine which boards are won and sum points
-    incomplete_boards = np.nonzero(complete_boards)[0]
-    c_boards = complete_boards.copy()
-    for g_board in incomplete_boards: # board from list of incomplete boards
-        c_boards = checkBoardComplete(g_board, c_boards).copy() # set board to updated list
-    board_points = won_board_points(c_boards)
-    point_sum
-    # TODO: determine which boards are won in sequential and sum points
-
-    # TODO: create list of incomplete boards
-
-    incomplete_boards = []
-    # search and sum points of incomplete boards
-    for i in range(0, 9):  # change to incomplete boards
+    for i in incomplete_boards:  # change to incomplete boards
         arr = temp_board[i][:]  # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
@@ -251,9 +232,26 @@ def points_won(temp_board):
             point_sum += two_in_row
         if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
             point_sum += two_in_row
-        # points from middle
+    return
+def points_won(temp_board):
+    """
+    # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
+    global board
+    :param g_board: temporary global board
+    :return: points_sum: total points won by the Pnum (Player)
+    """
+    point_sum = 0
+    # TODO: create list of incomplete boards
+    incomplete_boards = np.nonzero(complete_boards)[0] # list of board indices where no player has won
+    c_boards = complete_boards.copy()                  # c_board: copy of completed_boards list
+    for g_board in incomplete_boards:                  # for every board in list of incomplete_boards
+        c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy() # set board to updated list
+    incomplete_boards = c_boards.copy()
+    # TODO: determine which boards are won in sequential and sum points
+    board_points = won_board_points(c_boards)
+    # search and sum points for two_in_row
+    two_in_row(incomplete_boards, temp_board, board)
 
-        # points from corner
     return point_sum
 
 
