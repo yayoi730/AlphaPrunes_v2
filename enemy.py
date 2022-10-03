@@ -9,8 +9,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-Pnum = 4
-Enum = 4
+Pnum = 0
+Enum = 0
 # Point Weights
 win_game = 100
 win_seq_board = 60
@@ -63,10 +63,10 @@ def readMoves(file):
         moves = line.split()
         if moves[0] == 'enemy':
             board[int(moves[1])][int(moves[2])] = Pnum
-            checkBoardComplete(int(moves[1]))
+            checkBoardComplete(int(moves[1]), complete_boards)
         else:
             board[int(moves[1])][int(moves[2])] = Enum
-            checkBoardComplete(int(moves[1]))
+            checkBoardComplete(int(moves[1]), complete_boards)
     f.close()
     return last_move
 
@@ -95,7 +95,7 @@ def findNextMove(last_move):
     return move
 
 
-def checkBoardComplete(g_board):
+def checkBoardComplete(g_board, complete_boards):
     """
 
     :param g_board:
@@ -150,12 +150,13 @@ def checkBoardComplete(g_board):
     elif np.all(a):
         # returns true if and only if every value isn't zero in the array
         complete_boards[g_board] = 3
+    return complete_boards
 
 
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     board[int(next_move[0])][int(next_move[1])] = Pnum
-    checkBoardComplete(next_move[0])
+    checkBoardComplete(next_move[0], complete_boards)
     f = open("move_file", "r+")
     f.truncate(0)
     f.write("enemy " + str(next_move[0]) + " " + str(next_move[1]))
