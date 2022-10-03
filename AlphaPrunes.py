@@ -6,13 +6,24 @@ import time
 import numpy as np
 import random
 
-
 import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
-complete_boards = [0,0,0,0,0,0,0,0,0]
+complete_boards = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 Pnum = 4
 Enum = 4
+# Point Weights
+win_game = 100
+win_seq_board = 60
+win_center = 40
+win_corner = 35
+win_board = 30
+two_in_row = 10
+corner = 5
+middle = 3
+other_p = 0
+free_choice = -5
+
 
 def main():
     startFlag = True
@@ -64,6 +75,7 @@ def readMoves(file):
     f.close()
     return last_move
 
+
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
@@ -76,12 +88,12 @@ def findNextMove(last_move):
         last_move = random.choice(availableBoards)
         print("Changed To: " + str(last_move))
     for i in range(0, 9):
-        #if board[last_move][i] == Pnum or board[last_move][i] == Enum:
-        #takenList.append(board[last_move][i])
+        # if board[last_move][i] == Pnum or board[last_move][i] == Enum:
+        # takenList.append(board[last_move][i])
         #    takenList.append(i)
         if board[last_move][i] == 0:
             availableList.append(i)
-    #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+    # move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     move = [last_move, random.choice(availableList)]
     print("Last Move: " + str(last_move))
     print("Chosen Move: " + str(move))
@@ -92,13 +104,13 @@ def checkBoardComplete(g_board):
     # checks 3 in a row
     a = board[g_board][:]
     print(str(board[g_board][0:3]))
-    if np.array_equal(board[g_board][0:3],[1., 1., 1]):
+    if np.array_equal(board[g_board][0:3], [1., 1., 1]):
         print("row 1")
         complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][3:6],[1, 1, 1]):
+    elif np.array_equal(board[g_board][3:6], [1, 1, 1]):
         print("row 2")
         complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][6:9],[1, 1, 1]):
+    elif np.array_equal(board[g_board][6:9], [1, 1, 1]):
         print("row 3")
         complete_boards[g_board] = 1
     elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [1, 1, 1]):
@@ -116,28 +128,28 @@ def checkBoardComplete(g_board):
     elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [1, 1, 1]):
         print('diagonal 2')
         complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][0:3],[2, 2, 2]):
+    elif np.array_equal(board[g_board][0:3], [2, 2, 2]):
         print("row 1")
         complete_boards[g_board] = 2
     elif np.array_equal(board[g_board][3:6], [2, 2, 2]):
         print("row 2")
         complete_boards[g_board] = 2
-    elif np.array_equal(board[g_board][6:9],[2, 2, 2]):
+    elif np.array_equal(board[g_board][6:9], [2, 2, 2]):
         print("row 3")
         complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]],[2, 2, 2]):
+    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [2, 2, 2]):
         print("column 1")
         complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]],[2, 2, 2]):
+    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [2, 2, 2]):
         print('column 2')
         complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]],[2, 2, 2]):
+    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [2, 2, 2]):
         print('column 3')
         complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]],[2, 2, 2]):
+    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [2, 2, 2]):
         print('diagonal 1')
         complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]],[2, 2, 2]):
+    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [2, 2, 2]):
         print('diagonal 2')
         complete_boards[g_board] = 2
     elif all(a):
@@ -148,20 +160,22 @@ def checkBoardComplete(g_board):
 
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
-    f = open("move_file", "r+")
-    f.truncate(0)
     board[int(next_move[0])][int(next_move[1])] = Pnum
     checkBoardComplete(next_move[0])
+    f = open("move_file", "r+")
+    f.truncate(0)
     f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
-    print("moved made: AlphaPrunes " + str(next_move[0])+ " " + str(next_move[1]))
     f.close()
+    print("moved made: AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    points = points_won(board)
+    print("Points Won: " + str(points))
     display()
 
 
 def minimax(g_board, depth, alpha, beta, ally):
     # miniMax function with Alpha-Beta Pruning implemented
     if depth == 0:
-        return pointswon(g_board)  # checks the number of points won
+        return points_won(g_board)  # checks the number of points won
     if ally:
         max_eval = -math.inf
         for possible_move in g_board:
@@ -186,12 +200,48 @@ def minimax(g_board, depth, alpha, beta, ally):
         return min_eval
 
 
-def pointswon(g_board):
-    # static evaluation (utility) function that returns number of points won by Player
+def points_won(g_board):
+    """
+    # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
+    global board
+    :param g_board: global board
+    :return: points_sum: total points won by the Pnum (Player)
+    """
+    point_sum = 0
+    # sum points of won boards
 
-    # check
-    return 1
+    # determine which boards are won and sum points
 
+    # determine sequential boards won
+    incomplete_boards = []
+    # search and sum points of incomplete boards
+    for i in range(0, 9):  # change to incomplete boards
+        arr = g_board[i][:]  # retrieves a board
+        a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+        # check for 2 in a rows
+        # via rows:
+        if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
+            point_sum += two_in_row
+        # via columns:
+        if (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
+            point_sum += two_in_row
+        # via diagonals:
+        if (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
+            point_sum += two_in_row
+        # points from middle
+
+        # points from corner
+    return point_sum
 
 def display():
     # function that can be called to display the current state of the board
@@ -208,8 +258,6 @@ def display():
     print(str(board[6][0:3]) + " | " + str(board[7][0:3]) + " | " + str(board[8][0:3]))
     print(str(board[6][3:6]) + " | " + str(board[7][3:6]) + " | " + str(board[8][3:6]))
     print(str(board[6][6:9]) + " | " + str(board[7][6:9]) + " | " + str(board[8][6:9]))
-
-
 
 
 if __name__ == "__main__":
