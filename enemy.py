@@ -9,8 +9,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-Pnum = 0
-Enum = 0
+Pnum = 4
+Enum = 4
 # Point Weights
 win_game = 100
 win_seq_board = 60
@@ -63,10 +63,10 @@ def readMoves(file):
         moves = line.split()
         if moves[0] == 'enemy':
             board[int(moves[1])][int(moves[2])] = Pnum
-            checkBoardComplete(int(moves[1]), complete_boards)
+            checkBoardComplete(int(moves[1]))
         else:
             board[int(moves[1])][int(moves[2])] = Enum
-            checkBoardComplete(int(moves[1]), complete_boards)
+            checkBoardComplete(int(moves[1]))
     f.close()
     return last_move
 
@@ -76,11 +76,9 @@ def findNextMove(last_move):
     last_move = int(last_move[2])
     availableList = []
     availableBoards = []
-    print("Complete Boards: " + str(complete_boards))
     for i in range(0, 9):
         if complete_boards[i] == 0:
             availableBoards.append(i)
-
     if complete_boards[last_move] != 0:
         last_move = random.choice(availableBoards)
         print("Changed To: " + str(last_move))
@@ -94,69 +92,67 @@ def findNextMove(last_move):
     print("Last Move: " + str(last_move))
     return move
 
-
-def checkBoardComplete(g_board, complete_boards):
-    """
-
-    :param g_board:
-    :return:
-    """
-    arr = board[g_board][:]
-    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
-    # check rows
-    if (a[0] == Pnum).sum() == 3 or (a[0] == Enum).sum() == 3:
-        if Pnum in a[0]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    elif (a[1] == Pnum).sum() == 3 or (a[1] == Enum).sum() == 3:
-        if Pnum in a[1]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    elif (a[2] == Pnum).sum() == 3 or (a[2] == Enum).sum() == 3:
-        if Pnum in a[2]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    # check columns
-    elif (a[:, 0] == Pnum).sum() == 3 or (a[:, 0] == Enum).sum() == 3:
-        if Pnum in a[:, 0]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    elif (a[:, 1] == Pnum).sum() == 3 or (a[:, 1] == Enum).sum() == 3:
-        if Pnum in a[:, 1]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    elif (a[:, 2] == Pnum).sum() == 3 or (a[:, 2] == Enum).sum() == 3:
-        if Pnum in a[:, 2]:
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    # check diagonal
-    elif (a.diagonal() == Pnum).sum() == 3 or (a.diagonal() == Enum).sum() == 3:
-        if Pnum in a.diagonal():
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    elif (np.fliplr(a).diagonal() == Pnum).sum() == 3 or (np.fliplr(a).diagonal() == Enum).sum() == 3:
-        if Pnum in np.fliplr(a).diagonal():
-            complete_boards[g_board] = Pnum
-        else:
-            complete_boards[g_board] = Enum
-    # check if board is tied
-    elif np.all(a):
+def checkBoardComplete(g_board):
+    # checks 3 in a row
+    a = board[g_board][:]
+    if np.array_equal(board[g_board][0:3], [1., 1., 1]):
+        print("row 1")
+        complete_boards[g_board] = 1
+    elif np.array_equal(board[g_board][3:6], [1, 1, 1]):
+        print("row 2")
+        complete_boards[g_board] = 1
+    elif np.array_equal(board[g_board][6:9], [1, 1, 1]):
+        print("row 3")
+        complete_boards[g_board] = 1
+    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [1, 1, 1]):
+        print("column 1")
+        complete_boards[g_board] = 1
+    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [1, 1, 1]):
+        print('column 2')
+        complete_boards[g_board] = 1
+    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [1, 1, 1]):
+        print('column 3')
+        complete_boards[g_board] = 1
+    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [1, 1, 1]):
+        print('diagonal 1')
+        complete_boards[g_board] = 1
+    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [1, 1, 1]):
+        print('diagonal 2')
+        complete_boards[g_board] = 1
+    elif np.array_equal(board[g_board][0:3], [2, 2, 2]):
+        print("row 1")
+        complete_boards[g_board] = 2
+    elif np.array_equal(board[g_board][3:6], [2, 2, 2]):
+        print("row 2")
+        complete_boards[g_board] = 2
+    elif np.array_equal(board[g_board][6:9], [2, 2, 2]):
+        print("row 3")
+        complete_boards[g_board] = 2
+    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [2, 2, 2]):
+        print("column 1")
+        complete_boards[g_board] = 2
+    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [2, 2, 2]):
+        print('column 2')
+        complete_boards[g_board] = 2
+    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [2, 2, 2]):
+        print('column 3')
+        complete_boards[g_board] = 2
+    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [2, 2, 2]):
+        print('diagonal 1')
+        complete_boards[g_board] = 2
+    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [2, 2, 2]):
+        print('diagonal 2')
+        complete_boards[g_board] = 2
+    elif all(a):
         # returns true if and only if every value isn't zero in the array
         complete_boards[g_board] = 3
-    return complete_boards
+        print('tied')
 
 
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     board[int(next_move[0])][int(next_move[1])] = Pnum
-    checkBoardComplete(next_move[0], complete_boards)
+    checkBoardComplete(next_move[0])
     f = open("move_file", "r+")
     f.truncate(0)
     f.write("enemy " + str(next_move[0]) + " " + str(next_move[1]))
@@ -165,35 +161,6 @@ def addMove(next_move, last_move):
     points = points_won(board)
     print("Points Won: " + str(points))
     display()
-
-
-def minimax(g_board, depth, alpha, beta, ally):
-    # miniMax function with Alpha-Beta Pruning implemented
-    if depth == 0:
-        return points_won(g_board)  # checks the number of points won
-    if ally:
-        max_eval = -math.inf
-        for possible_move in g_board:
-            eval = minimax(possible_move, depth - 1, alpha, beta, not ally)
-            max_eval = max(max_eval, eval)
-            """
-            alpha = max(alpha, eval)
-            if beta <= alpha
-                break
-            """
-        return max_eval
-    else:
-        min_eval = math.inf
-        for possible_move in g_board:
-            eval = minimax(possible_move, depth - 1, alpha, beta, ally)
-            min_eval = min(min_eval, eval)
-            """
-            beta = min(beta, eval)
-            if beta <= alpha
-            break
-            """
-        return min_eval
-
 
 def points_won(g_board):
     """
