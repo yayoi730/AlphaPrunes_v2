@@ -76,6 +76,7 @@ def findNextMove(last_move):
     last_move = int(last_move[2])
     availableList = []
     availableBoards = []
+    print("Complete Boards: " + str(complete_boards))
     for i in range(0, 9):
         if complete_boards[i] == 0:
             availableBoards.append(i)
@@ -95,60 +96,60 @@ def findNextMove(last_move):
 
 
 def checkBoardComplete(g_board):
-    # checks 3 in a row
-    a = board[g_board][:]
-    if np.array_equal(board[g_board][0:3], [1., 1., 1]):
-        print("row 1")
-        complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][3:6], [1, 1, 1]):
-        print("row 2")
-        complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][6:9], [1, 1, 1]):
-        print("row 3")
-        complete_boards[g_board] = 1
-    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [1, 1, 1]):
-        print("column 1")
-        complete_boards[g_board] = 1
-    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [1, 1, 1]):
-        print('column 2')
-        complete_boards[g_board] = 1
-    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [1, 1, 1]):
-        print('column 3')
-        complete_boards[g_board] = 1
-    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [1, 1, 1]):
-        print('diagonal 1')
-        complete_boards[g_board] = 1
-    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [1, 1, 1]):
-        print('diagonal 2')
-        complete_boards[g_board] = 1
-    elif np.array_equal(board[g_board][0:3], [2, 2, 2]):
-        print("row 1")
-        complete_boards[g_board] = 2
-    elif np.array_equal(board[g_board][3:6], [2, 2, 2]):
-        print("row 2")
-        complete_boards[g_board] = 2
-    elif np.array_equal(board[g_board][6:9], [2, 2, 2]):
-        print("row 3")
-        complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][0], board[g_board][3], board[g_board][6]], [2, 2, 2]):
-        print("column 1")
-        complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][1], board[g_board][4], board[g_board][7]], [2, 2, 2]):
-        print('column 2')
-        complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][2], board[g_board][5], board[g_board][8]], [2, 2, 2]):
-        print('column 3')
-        complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][0], board[g_board][4], board[g_board][8]], [2, 2, 2]):
-        print('diagonal 1')
-        complete_boards[g_board] = 2
-    elif np.array_equal([board[g_board][2], board[g_board][4], board[g_board][6]], [2, 2, 2]):
-        print('diagonal 2')
-        complete_boards[g_board] = 2
-    elif all(a):
+    """
+
+    :param g_board:
+    :return:
+    """
+    arr = board[g_board][:]
+    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+    # check rows
+    if (a[0] == Pnum).sum() == 3 or (a[0] == Enum).sum() == 3:
+        if Pnum in a[0]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    elif (a[1] == Pnum).sum() == 3 or (a[1] == Enum).sum() == 3:
+        if Pnum in a[1]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    elif (a[2] == Pnum).sum() == 3 or (a[2] == Enum).sum() == 3:
+        if Pnum in a[2]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    # check columns
+    elif (a[:, 0] == Pnum).sum() == 3 or (a[:, 0] == Enum).sum() == 3:
+        if Pnum in a[:, 0]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    elif (a[:, 1] == Pnum).sum() == 3 or (a[:, 1] == Enum).sum() == 3:
+        if Pnum in a[:, 1]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    elif (a[:, 2] == Pnum).sum() == 3 or (a[:, 2] == Enum).sum() == 3:
+        if Pnum in a[:, 2]:
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    # check diagonal
+    elif (a.diagonal() == Pnum).sum() == 3 or (a.diagonal() == Enum).sum() == 3:
+        if Pnum in a.diagonal():
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    elif (np.fliplr(a).diagonal() == Pnum).sum() == 3 or (np.fliplr(a).diagonal() == Enum).sum() == 3:
+        if Pnum in np.fliplr(a).diagonal():
+            complete_boards[g_board] = Pnum
+        else:
+            complete_boards[g_board] = Enum
+    # check if board is tied
+    elif np.all(a):
         # returns true if and only if every value isn't zero in the array
         complete_boards[g_board] = 3
-        print('tied')
 
 
 def addMove(next_move, last_move):
@@ -191,7 +192,6 @@ def minimax(g_board, depth, alpha, beta, ally):
             break
             """
         return min_eval
-
 
 
 def points_won(g_board):
