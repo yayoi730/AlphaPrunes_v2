@@ -10,8 +10,8 @@ import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-Pnum = 4
-Enum = 4
+Pnum = 0
+Enum = 0
 # Point Weights
 win_game = 100
 win_seq_board = 60
@@ -23,7 +23,9 @@ corner = 5
 middle = 3
 other_p = 0
 free_choice = -5
-
+# List of Sets of Possible Sequences for Boards
+possible_two_seq = [{0, 1}, {1, 2}, {0, 2}, {0, 3}, {3, 6}, {0, 6}, {0, 4}, {0, 8}, {4, 8},
+                    {1, 4}, {4, 7}, {1, 7}, {2, 5}, {5, 8}, {2, 8}, {2, 4}, {4, 6}, {2, 6}]
 
 def main():
     startFlag = True
@@ -53,7 +55,6 @@ def main():
         addMove(next_move, last_move)
         startFlag = False
 
-
 def readMoves(file):
     # reads in txt file and populates the board with the move information
     # returns the last move made in a list ex: ['X'. '1' '2']
@@ -68,14 +69,12 @@ def readMoves(file):
             moves = line.split()
             if moves[0] == 'AlphaPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
-                checkBoardComplete(int(moves[1]),complete_boards,board)
+                checkBoardComplete(int(moves[1]), complete_boards, board)
             else:
                 board[int(moves[1])][int(moves[2])] = Enum
-                checkBoardComplete(int(moves[1]),complete_boards,board)
+                checkBoardComplete(int(moves[1]), complete_boards, board)
     f.close()
     return last_move
-
-
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
@@ -99,6 +98,18 @@ def findNextMove(last_move):
     print("Last Move: " + str(last_move))
     print("Chosen Move: " + str(move))
     return move
+def addMove(next_move, last_move):
+    # function that takes in the next move (int) and adds it to move_file
+    board[int(next_move[0])][int(next_move[1])] = Pnum
+    checkBoardComplete(next_move[0], complete_boards, board)
+    f = open("move_file", "r+")
+    f.truncate(0)
+    f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    f.close()
+    print("moved made: AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    points = points_won(board)
+    print("Points Won: " + str(points))
+    display()
 def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
     # miniMax function with Alpha-Beta Pruning implemented
     if depth == 0:
@@ -132,18 +143,16 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
             """
         return min_eval
 
-
 def abNextMove(last_move):
     moves_list = nextMoves(last_move)
     print("Moves List: ")
     print(moves_list)
     move_num = minimax(moves_list, board, complete_boards, 2, -1000000, 1000000, True)
     return move_num
-
 def nextMoves(last_move):
     free_moves = []
-    if complete_boards[last_move] != 0:  #check if last move was to a complete board
-        for i in range(0, 9):  #generates a list of free spaces for all uncomplete boards
+    if complete_boards[last_move] != 0:  # check if last move was to a complete board
+        for i in range(0, 9):  # generates a list of free spaces for all uncomplete boards
             if complete_boards[i] == 0:
                 for j in range(0, 9):
                     if board[last_move][i] == 0:
@@ -162,84 +171,42 @@ def updateBoard(tempMove, tempBoard, tempList, num):
     checkBoardComplete(tempMove[1], tempList, copy_board)
     return copy_board
 
-def checkBoardComplete(g_board, c_boards, a_board):
-   """
-   Checks whether a board has been complete after a move and updates the global complete_boards list
-   :param g_board: takes in a index that corresponds to a 3x3 cell
-   :return: list of complete boards where 0 = incomplete, Pnum = complete
-   """
-   arr = a_board[g_board][:]
-   a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
-   # check rows
-   if (a[0] == Pnum).sum() == 3 or (a[0] == Enum).sum() == 3:
-       if Pnum in a[0]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   elif (a[1] == Pnum).sum() == 3 or (a[1] == Enum).sum() == 3:
-       if Pnum in a[1]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   elif (a[2] == Pnum).sum() == 3 or (a[2] == Enum).sum() == 3:
-       if Pnum in a[2]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   # check columns
-   elif (a[:, 0] == Pnum).sum() == 3 or (a[:, 0] == Enum).sum() == 3:
-       if Pnum in a[:, 0]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   elif (a[:, 1] == Pnum).sum() == 3 or (a[:, 1] == Enum).sum() == 3:
-       if Pnum in a[:, 1]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   elif (a[:, 2] == Pnum).sum() == 3 or (a[:, 2] == Enum).sum() == 3:
-       if Pnum in a[:, 2]:
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-   # check diagonal
-   elif (a.diagonal() == Pnum).sum() == 3 or (a.diagonal() == Enum).sum() == 3:
-       if Pnum in a.diagonal():
-           c_boards[g_board] = Pnum
-       else:
-           c_boards[g_board] = Enum
-
-
-
-def addMove(next_move, last_move):
-    # function that takes in the next move (int) and adds it to move_file
-    board[int(next_move[0])][int(next_move[1])] = Pnum
-    checkBoardComplete(next_move[0], complete_boards, board)
-    f = open("move_file", "r+")
-    f.truncate(0)
-    f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
-    f.close()
-    print("moved made: AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
-    points = points_won(board)
-    print("Points Won: " + str(points))
-    display()
-def points_won(g_board):
+def points_won(temp_board):
     """
     # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
     global board
-    :param g_board: global board
+    :param temp_board: tempo
     :return: points_sum: total points won by the Pnum (Player)
     """
     point_sum = 0
-    # sum points of won boards
+    # create list of incomplete boards
+    incomplete_boards = np.nonzero(complete_boards)[0]  # list of board indices where no player has won
+    c_boards = complete_boards.copy()                   # c_board: completed_boards list
+    # update number of complete boards based on temp_board config.
+    for g_board in incomplete_boards:
+        """
+        For every board in incomplete_boards, check if that board has been completed in the temp_board,
+        return updated list of completed boards which is set to c_boards
+        """
+        c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy()  # set board to updated list
+    incomplete_boards = np.nonzero(c_boards)
+    # sum points for # of boards one, and check for seq. boards
+    board_points = won_board_points(c_boards)
+    point_sum += board_points
+    # search and sum points for two_in_row
+    twr_points = two_in_row(incomplete_boards, temp_board, board)
+    point_sum += twr_points
 
-    # determine which boards are won and sum points
-
-    # determine sequential boards won
-    incomplete_boards = []
-    # search and sum points of incomplete boards
-    for i in range(0, 9):  # change to incomplete boards
-        arr = g_board[i][:]  # retrieves a board
+    return point_sum
+def two_in_row(incomplete_boards, temp_board):
+    """
+    Determines the number of two in a rows Pnum (Player) has made and totals points
+    :param incomplete_boards (list of incomplete boards), temp_board: temporary global board config.
+    :return: points_sum: total points won by the Pnum (Player)
+    """
+    point_sum = 0
+    for i in incomplete_boards:  # change to incomplete boards
+        arr = temp_board[i][:]   # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
         # via rows:
@@ -261,14 +228,82 @@ def points_won(g_board):
             point_sum += two_in_row
         if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
             point_sum += two_in_row
-        # points from middle
-
-        # points from corner
     return point_sum
-
+def checkBoardComplete(g_board, c_boards, a_board):
+    """
+    Checks whether a board has been complete after a move and updates the global complete_boards list
+    :param g_board, c_boards (list of complete boards), a_boarg (global board config).
+    :return: list of complete boards where 0 = incomplete, Pnum = complete
+    """
+    arr = a_board[g_board][:]    # retrieves array size = 9 at location g_board in a_board
+    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+    # check rows
+    if (a[0] == Pnum).sum() == 3 or (a[0] == Enum).sum() == 3:
+        if Pnum in a[0]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    elif (a[1] == Pnum).sum() == 3 or (a[1] == Enum).sum() == 3:
+        if Pnum in a[1]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    elif (a[2] == Pnum).sum() == 3 or (a[2] == Enum).sum() == 3:
+        if Pnum in a[2]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    # check columns
+    elif (a[:, 0] == Pnum).sum() == 3 or (a[:, 0] == Enum).sum() == 3:
+        if Pnum in a[:, 0]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    elif (a[:, 1] == Pnum).sum() == 3 or (a[:, 1] == Enum).sum() == 3:
+        if Pnum in a[:, 1]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    elif (a[:, 2] == Pnum).sum() == 3 or (a[:, 2] == Enum).sum() == 3:
+        if Pnum in a[:, 2]:
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    # check diagonal
+    elif (a.diagonal() == Pnum).sum() == 3 or (a.diagonal() == Enum).sum() == 3:
+        if Pnum in a.diagonal():
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    elif (np.fliplr(a).diagonal() == Pnum).sum() == 3 or (np.fliplr(a).diagonal() == Enum).sum() == 3:
+        if Pnum in np.fliplr(a).diagonal():
+            c_boards[g_board] = Pnum
+        else:
+            c_boards[g_board] = Enum
+    # check if board is tied
+    elif np.all(a):
+        # returns true if and only if every value isn't zero in the array
+        c_boards[g_board] = 3
+    return complete_boards
+def won_board_points(c_boards):
+    """
+    Determines the number of boards won and in what seq, adds points based on the two
+    :param c_boards: List of Completed Boards
+    :return: points_sum: Total points earned
+    """
+    # sum points for boards that were won
+    points_sum = 0
+    indices = [i for i, x in enumerate(c_boards) if x == 1]
+    points_sum += len(indices)*win_board
+    # TODO: adjust it so it doesn't duplicate bonus points
+    for a_set in possible_two_seq:
+        if a_set.issubset(indices):
+            points_sum += win_seq_board
+    return points_sum
 def display():
-    # function that can be called to display the current state of the board
-    # arranged in ultimate tic-tac-toe style (X = 1 and O = 2)
+    """"
+    function that can be called to display the current state of the board in terms of [0, Pnum, Enum]
+    """
     print("Current Board:")
     print(str(board[0][0:3]) + " | " + str(board[1][0:3]) + " | " + str(board[2][0:3]))
     print(str(board[0][3:6]) + " | " + str(board[1][3:6]) + " | " + str(board[2][3:6]))
@@ -281,7 +316,6 @@ def display():
     print(str(board[6][0:3]) + " | " + str(board[7][0:3]) + " | " + str(board[8][0:3]))
     print(str(board[6][3:6]) + " | " + str(board[7][3:6]) + " | " + str(board[8][3:6]))
     print(str(board[6][6:9]) + " | " + str(board[7][6:9]) + " | " + str(board[8][6:9]))
-
 
 if __name__ == "__main__":
     main()
