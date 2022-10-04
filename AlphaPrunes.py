@@ -98,10 +98,9 @@ def findNextMove(last_move):
         #    takenList.append(i)
         if board[last_move][i] == 0:
             availableList.append(i)
-    # move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
-
-
-    move = [last_move, random.choice(availableList)]
+    moves_list = nextMoves(last_move)
+    move = minimax_starter(moves_list, board, complete_boards)
+    #move = [last_move, random.choice(availableList)]
     print("Last Move: " + str(last_move))
     print("Chosen Move: " + str(move))
     return move
@@ -117,6 +116,23 @@ def addMove(next_move, last_move):
     points = points_won(board)
     print("Points Won: " + str(points))
     display()
+
+
+
+def minimax_starter(moves_list, updated_board, temp_list):
+    final_move = []
+    top_score = 0
+    c_updated_board = updated_board
+
+    for i in range(0, len(moves_list)):
+        updated_board = updateBoard(moves_list[i], updated_board, temp_list, Pnum)
+        score = minimax(moves_list, updated_board, temp_list, 2, 10000, -10000, False)
+        if (score > top_score):
+            final_move = moves_list[i]
+
+        updated_board = c_updated_board
+    return final_move
+
 def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
     # miniMax function with Alpha-Beta Pruning implemented
     if depth == 0:
@@ -149,6 +165,8 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
             break
             """
         return min_eval
+
+
 def abNextMove(last_move):
     moves_list = nextMoves(last_move)
     print("Moves List: ")
@@ -158,7 +176,7 @@ def abNextMove(last_move):
 def nextMoves(last_move):
     free_moves = []
     if complete_boards[last_move] != 0:  # check if last move was to a complete board
-        for i in range(0, 9):            # generates a list of free spaces for all incomplete boards
+        for i in range(0, 9):  # generates a list of free spaces for all uncomplete boards
             if complete_boards[i] == 0:
                 for j in range(0, 9):
                     if board[last_move][i] == 0:
