@@ -20,7 +20,7 @@ win_center = 40
 win_corner = 35
 win_board = 30
 two_in_row = 10
-three_in_row = 15
+three_in_row = 30
 corner = 5
 middle = 3
 side = 1
@@ -86,30 +86,12 @@ def readMoves(file):
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
-    abNextMove(last_move)
-    availableList = []
-    availableBoards = []
-    for i in range(0, 9):
-        if complete_boards[i] == 0:
-            availableBoards.append(i)
-    if complete_boards[last_move] != 0:
-        last_move = random.choice(availableBoards)
-        print("Changed To: " + str(last_move))
-
-    for i in range(0, 9):
-        # if board[last_move][i] == Pnum or board[last_move][i] == Enum:
-        # takenList.append(board[last_move][i])
-        #    takenList.append(i)
-        if board[last_move][i] == 0:
-            availableList.append(i)
     moves_list = nextMoves(last_move)
     move = minimax_starter(moves_list, board, complete_boards)
-    # move = [last_move, random.choice(availableList)]
+    #move = [last_move, random.choice(availableList)]
     print("Last Move: " + str(last_move))
     print("Chosen Move: " + str(move))
     return move
-
-
 def addMove(next_move, last_move):
     # function that takes in the next move (int) and adds it to move_file
     board[int(next_move[0])][int(next_move[1])] = Pnum
@@ -119,29 +101,31 @@ def addMove(next_move, last_move):
     f.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     f.close()
     print("moved made: AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    points = points_won(board)
+    print("Points Won: " + str(points))
     display()
 
 
-def minimax_starter(moves_list, updated_board, temp_list):
-    final_move = []
-    top_score = 0
+
+def minimax_starter(moves_list, updated_board, temp_list): #takes list of potential moves, the board, and list of complete boards
+    final_move = [] #move that AI will choose
+    top_score = -100000 #set negative so AI will pick a move
     c_updated_board = updated_board
 
-    for i in range(0, len(moves_list)):
-        updated_board = updateBoard(moves_list[i], updated_board, temp_list, Pnum)
-        score = minimax(moves_list, updated_board, temp_list, 2, 10000, -10000, False)
-        if (score >= top_score):
+    for i in range(0, len(moves_list)): #every potential move
+        updated_board = updateBoard(moves_list[i], updated_board, temp_list, Pnum) #gets board with next move on it and updates temp list
+        score = minimax(moves_list, updated_board, temp_list, 20, 10000, -10000, False)
+        if (score > top_score):
+            top_score = score
             final_move = moves_list[i]
 
         updated_board = c_updated_board
     return final_move
 
-
 def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
     # miniMax function with Alpha-Beta Pruning implemented
     if depth == 0:
         won = points_won(updated_board)
-        print(str(won))
         return won  # checks the number of points won
     if ally:
         max_eval = -math.inf
@@ -150,11 +134,9 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
             updated_board = updateBoard(possible_move, updated_board, temp_list, Pnum)
             eval = minimax(nextMoves(possible_move[1]), updated_board, temp_list, depth - 1, alpha, beta, not ally)
             max_eval = max(max_eval, eval)
-            """
             alpha = max(alpha, eval)
-            if beta <= alpha
+            if beta <= alpha:
                 break
-            """
         return max_eval
     else:
         min_eval = math.inf
@@ -163,21 +145,10 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
             updated_board = updateBoard(possible_move, updated_board, temp_list, Enum)
             eval = minimax(nextMoves(possible_move[1]), updated_board, temp_list, depth - 1, alpha, beta, ally)
             min_eval = min(min_eval, eval)
-            """
             beta = min(beta, eval)
-            if beta <= alpha
-            break
-            """
+            if beta <= alpha:
+                break
         return min_eval
-
-
-def abNextMove(last_move):
-    moves_list = nextMoves(last_move)
-    print("Moves List: ")
-    print(moves_list)
-    move_num = minimax(moves_list, board, complete_boards, 2, -1000000, 1000000, True)
-    return move_num
-
 
 def nextMoves(last_move):
     free_moves = []
@@ -196,9 +167,6 @@ def nextMoves(last_move):
 
 def updateBoard(tempMove, tempBoard, tempList, num):
     copy_board = np.copy(tempBoard, 'K')
-    print("copy_board: ")
-    print(str(copy_board))
-    print(str(tempMove))
     copy_board[tempMove[0]][tempMove[1]] = num
     checkBoardComplete(tempMove[1], tempList, copy_board)
     return copy_board
@@ -224,9 +192,7 @@ def points_won(temp_board):
         c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy()  # set board to updated list
     incomplete_boards = np.nonzero(c_boards)[0]
     # sum points for # of boards one, and check for seq. boards
-    print("Length: " + str(c_boards))
     board_points = won_board_points(c_boards)
-    print(board_points)
     point_sum += board_points
     # search and sum points for three_in_row
     thr_points = three_in_rows(incomplete_boards, temp_board)
@@ -235,7 +201,7 @@ def points_won(temp_board):
     twr_points = two_in_rows(incomplete_boards, temp_board)
     point_sum += twr_points
     # evalutes individual spots on a board
-    # point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
+    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
     return point_sum
 
 
@@ -247,8 +213,7 @@ def two_in_rows(incomplete_boards, temp_board):
     """
     point_sum = 0
     for i in incomplete_boards:  # change to incomplete boards
-        print(str(i))
-        arr = temp_board[i][:]  # retrieves a board
+        arr = temp_board[i][:]   # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
         # via rows:
@@ -270,6 +235,25 @@ def two_in_rows(incomplete_boards, temp_board):
             point_sum += two_in_row
         if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
             point_sum += two_in_row
+        #enemy
+        if (a[0] == Enum).sum() == 2 and (a[0] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        if (a[1] == Enum).sum() == 2 and (a[1] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        if (a[2] == Enum).sum() == 2 and (a[2] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        # via columns:
+        if (a[:, 0] == Enum).sum() == 2 and (a[:, 0] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        if (a[:, 1] == Enum).sum() == 2 and (a[:, 1] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        if (a[:, 2] == Enum).sum() == 2 and (a[:, 2] == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        # via diagonals:
+        if (a.diagonal() == Enum).sum() == 2 and (a.diagonal() == Pnum).sum() == 0:
+            point_sum += -two_in_row
+        if (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
+            point_sum += -two_in_row
     return point_sum
 
 
@@ -281,8 +265,7 @@ def three_in_rows(incomplete_boards, temp_board):
     """
     point_sum = 0
     for i in incomplete_boards:  # change to incomplete boards
-        print(str(i))
-        arr = temp_board[i][:]  # retrieves a board
+        arr = temp_board[i][:]   # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
         # via rows:
@@ -433,6 +416,13 @@ def corner_center_side_eval_func(hypo_board_config, incomplete_boards):
                 eval_points += side
             elif hypo_board_config[x][y] == Pnum and (y == 4):
                 eval_points += middle
+            #enemy
+            if hypo_board_config[x][y] == Enum and (y == 0 or y == 2 or y == 6 or y == 8):
+                eval_points -= corner
+            elif hypo_board_config[x][y] == Enum and (y == 1 or y == 3 or y == 5 or y == 7):
+                eval_points -= side
+            elif hypo_board_config[x][y] == Enum and (y == 4):
+                eval_points -= middle
 
     return eval_points
 
