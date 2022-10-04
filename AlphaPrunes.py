@@ -202,7 +202,8 @@ def points_won(temp_board):
     # search and sum points for two_in_row
     twr_points = two_in_row(incomplete_boards, temp_board, board)
     point_sum += twr_points
-
+    # evalutes individual spots on a board
+    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
     return point_sum
 def two_in_row(incomplete_boards, temp_board):
     """
@@ -306,57 +307,6 @@ def won_board_points(c_boards):
         if a_set.issubset(indices):
             points_sum += win_seq_board
     return points_sum
-
-def two_in_row(incomplete_boards, temp_board, board):
-    point_sum = 0
-    for i in incomplete_boards:  # change to incomplete boards
-        arr = temp_board[i][:]  # retrieves a board
-        a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
-        # check for 2 in a rows
-        # via rows:
-        if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
-            point_sum += two_in_row
-        if (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
-            point_sum += two_in_row
-        if (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
-            point_sum += two_in_row
-        # via columns:
-        if (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
-            point_sum += two_in_row
-        if (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
-            point_sum += two_in_row
-        if (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
-            point_sum += two_in_row
-        # via diagonals:
-        if (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
-            point_sum += two_in_row
-        if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
-            point_sum += two_in_row
-    return
-def points_won(temp_board):
-    """
-    # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
-    global board
-    :param g_board: temporary global board
-    :return: points_sum: total points won by the Pnum (Player)
-    """
-    point_sum = 0
-    # TODO: create list of incomplete boards
-    incomplete_boards = np.nonzero(complete_boards)[0] # list of board indices where no player has won
-    c_boards = complete_boards.copy()                  # c_board: copy of completed_boards list
-    for g_board in incomplete_boards:                  # for every board in list of incomplete_boards
-        c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy() # set board to updated list
-    incomplete_boards = c_boards.copy()
-    # TODO: determine which boards are won in sequential and sum points
-    #board_points = won_board_points(c_boards)
-    # search and sum points for two_in_row
-    #two_in_row(incomplete_boards, temp_board, board)
-
-    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
-
-        # points from corner
-    return point_sum
-
 def corner_center_side_eval_func(hypo_board_config, incomplete_boards):
     eval_points = 0
     for x in range(0, len(hypo_board_config)):
