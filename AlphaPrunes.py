@@ -176,7 +176,6 @@ def updateBoard(tempMove, tempBoard, tempList, num):
     copy_board[tempMove[0]][tempMove[1]] = num
     checkBoardComplete(tempMove[1], tempList, copy_board)
     return copy_board
-
 def points_won(temp_board):
     """
     # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
@@ -195,12 +194,12 @@ def points_won(temp_board):
         return updated list of completed boards which is set to c_boards
         """
         c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy()  # set board to updated list
-    incomplete_boards = np.nonzero(c_boards)
+    incomplete_boards = np.nonzero(c_boards)[0]
     # sum points for # of boards one, and check for seq. boards
     board_points = won_board_points(c_boards)
     point_sum += board_points
     # search and sum points for two_in_row
-    twr_points = two_in_row(incomplete_boards, temp_board, board)
+    twr_points = two_in_row(incomplete_boards, temp_board)
     point_sum += twr_points
     # evalutes individual spots on a board
     point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
@@ -213,7 +212,8 @@ def two_in_row(incomplete_boards, temp_board):
     """
     point_sum = 0
     for i in incomplete_boards:  # change to incomplete boards
-        arr = temp_board[i][:]   # retrieves a board
+        print(str(i))
+        arr = board[i][:]   # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
         # via rows:
