@@ -90,30 +90,34 @@ def addMove(next_move):
     f.close()
     print("Moved Made: AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     display()
+    print("------------------------------")
 def findNextMove(last_move):
     # function that determines the next move the player will make
     print("Last Move: " + str(last_move))
-    last_move = int(last_move[2])
-    moves_list = nextMoves(last_move)
-    move = minimax_starter(moves_list, board, complete_boards)
+    last_move_on_local = int(last_move[2])
+    moves_available = nextMoves(last_move_on_local)
+    move = minimax_starter(moves_available, board, complete_boards)
     #move = [last_move, random.choice(availableList)]
     return move
 
-def minimax_starter(moves_list, updated_board, temp_list): #takes list of potential moves, the board, and list of complete boards
+# Works
+def minimax_starter(moves_list, updated_board, comp_boards): #takes list of potential moves, the board, and list of complete boards
     final_move = [] #move that AI will choose
     top_score = -100000 #set negative so AI will pick a move
     c_updated_board = updated_board
 
+    print("Move score: ")
     for i in range(0, len(moves_list)): #every potential move
-        updated_board = updateBoard(moves_list[i], updated_board, temp_list, Pnum) #gets board with next move on it and updates temp list
-        score = minimax(moves_list, updated_board, temp_list, 20, 10000, -10000, False)
+        updated_board = updateBoard(moves_list[i], updated_board, comp_boards, Pnum) #gets board with next move on it and updates temp list
+        score = minimax(moves_list, updated_board, comp_boards, 6, 10000, -10000, True)
+        print("Move - [" + str(moves_list[i]) + "] - score - " + str(score))
         if (score > top_score):
             top_score = score
             final_move = moves_list[i]
         updated_board = c_updated_board
     return final_move
 
-def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
+def minimax(moves_list, updated_board, comp_boards, depth, alpha, beta, ally):
     # miniMax function with Alpha-Beta Pruning implemented
     if depth == 0:
         won = points_won(updated_board)
@@ -121,9 +125,9 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
     if ally:
         max_eval = -math.inf
         for possible_move in moves_list:
-            temp_list = np.copy(temp_list, 'K')
-            updated_board = updateBoard(possible_move, updated_board, temp_list, Pnum)
-            eval = minimax(nextMoves(possible_move[1]), updated_board, temp_list, depth - 1, alpha, beta, not ally)
+            comp_boards = np.copy(comp_boards, 'K')
+            updated_board = updateBoard(possible_move, updated_board, comp_boards, Pnum)
+            eval = minimax(nextMoves(possible_move[1]), updated_board, comp_boards, depth - 1, alpha, beta, not ally)
             max_eval = max(max_eval, eval)
             alpha = max(alpha, eval)
             if beta <= alpha:
@@ -132,27 +136,29 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
     else:
         min_eval = math.inf
         for possible_move in moves_list:
-            temp_list = np.copy(temp_list, 'K')
-            updated_board = updateBoard(possible_move, updated_board, temp_list, Enum)
-            eval = minimax(nextMoves(possible_move[1]), updated_board, temp_list, depth - 1, alpha, beta, ally)
+            comp_boards = np.copy(comp_boards, 'K')
+            updated_board = updateBoard(possible_move, updated_board, comp_boards, Enum)
+            eval = minimax(nextMoves(possible_move[1]), updated_board, comp_boards, depth - 1, alpha, beta, ally)
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
             if beta <= alpha:
                 break
         return min_eval
 
-def nextMoves(last_move):
+#What is the parameter last move? a list or just the board index
+def nextMoves(last_local_move):
     free_moves = []
-    if complete_boards[last_move] != 0:  # check if last move was to a complete board
+
+    if complete_boards[last_local_move] != 0:  # check if last move was to a complete board
         for i in range(0, 9):  # generates a list of free spaces for all uncomplete boards
             if complete_boards[i] == 0:
                 for j in range(0, 9):
-                    if board[last_move][i] == 0:
+                    if board[i][j] == 0:
                         free_moves.append([i, j])
     else:
         for i in range(0, 9):
-            if board[last_move][i] == 0:
-                free_moves.append([last_move, i])
+            if board[last_local_move][i] == 0:
+                free_moves.append([last_local_move, i])
     return free_moves
 
 def updateBoard(tempMove, tempBoard, tempList, num):
@@ -187,10 +193,10 @@ def points_won(temp_board):
     board_points = won_board_points(c_boards)
     point_sum += board_points
     # search and sum points for two_in_row
-    twr_points = two_in_rows(incomplete_boards, temp_board)
-    point_sum += twr_points
+    #twr_points = two_in_rows(incomplete_boards, temp_board)
+    #point_sum += twr_points
     # evaluates individual spots on a board
-    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
+    #point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
     return point_sum
 def two_in_rows(incomplete_boards, temp_board):
     """
