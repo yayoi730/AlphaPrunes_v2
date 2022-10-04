@@ -199,12 +199,12 @@ def points_won(temp_board):
     board_points = won_board_points(c_boards)
     point_sum += board_points
     # search and sum points for two_in_row
-    twr_points = two_in_row(incomplete_boards, temp_board)
+    twr_points = two_in_rows(incomplete_boards, temp_board)
     point_sum += twr_points
     # evalutes individual spots on a board
     point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
     return point_sum
-def two_in_row(incomplete_boards, temp_board):
+def two_in_rows(incomplete_boards, temp_board):
     """
     Determines the number of two in a rows Pnum (Player) has made and totals points
     :param incomplete_boards (list of incomplete boards), temp_board: temporary global board config.
