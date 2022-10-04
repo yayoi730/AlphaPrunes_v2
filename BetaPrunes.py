@@ -37,14 +37,14 @@ def main():
     startFlag = True
     while not exists("end_game"):
         time.sleep(1)
-        while not exists("AlphaPrunes.go"):
+        while not exists("BetaPrunes.go"):
             pass
         time.sleep(0.1)
         if startFlag:
             last_move = readMoves('first_four_moves')
             global Pnum
             global Enum
-            if last_move[0] == "AlphaPrunes":
+            if last_move[0] == "BetaPrunes":
                 Pnum = 2
                 Enum = 1
                 last_move = readMoves('first_four_moves')
@@ -72,7 +72,7 @@ def readMoves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'AlphaPrunes':
+            if moves[0] == 'BetaPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
                 checkBoardComplete(int(moves[1]), complete_boards_list, board)
             else:
@@ -87,7 +87,7 @@ def addMove(next_move):
     file = open('move_file', 'r+')
     # read in the move from the other player here...
     file.seek(0)
-    file.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    file.write("BetaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     file.truncate()
     file.close()
     display(board)
