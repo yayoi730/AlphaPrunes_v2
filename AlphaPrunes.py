@@ -89,7 +89,7 @@ def addMove(next_move):
     file.write("AlphaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     file.truncate()
     file.close()
-    display()
+    display(board)
 def findNextMove(last_move):
     # function that determines the next move the player will make
     print("Last Move: " + str(last_move))
@@ -188,11 +188,16 @@ def points_won(temp_board, temp_comp_board):
  
         c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy()  # set board to updated list
     """
+    print("TEMP BOARD CONFIG:")
+    display(temp_comp_board)
     # update incomplete_boards
     incomplete_boards = [x for x, n in enumerate(temp_comp_board) if n == 0]
+    print("TEMP Incomplete Boards: " + str(incomplete_boards))
+    print("TEMP Complete Boards: " + str(temp_comp_board))
     # sum points for # of boards one, and check for seq. boards
     board_points = won_board_points(temp_comp_board)
     point_sum += board_points
+    print("WON BOARD POINTS: " + str(board_points))
     # search and sum points for two_in_row
     twr_points = two_in_rows(incomplete_boards, temp_board)
     point_sum += twr_points
@@ -434,23 +439,22 @@ def checkBoardComplete2(g_board, c_boards, a_board):
         # returns true if and only if every value isn't zero in the array
         c_boards[g_board] = 3
     return c_boards
-def display():
+def display(a_board):
     """"
     function that can be called to display the current state of the board in terms of [0, Pnum, Enum]
     """
     print("Current Board:")
-    print(str(board[0][0:3]) + " | " + str(board[1][0:3]) + " | " + str(board[2][0:3]))
-    print(str(board[0][3:6]) + " | " + str(board[1][3:6]) + " | " + str(board[2][3:6]))
-    print(str(board[0][6:9]) + " | " + str(board[1][6:9]) + " | " + str(board[2][6:9]))
+    print(str(a_board[0][0:3]) + " | " + str(a_board[1][0:3]) + " | " + str(a_board[2][0:3]))
+    print(str(a_board[0][3:6]) + " | " + str(a_board[1][3:6]) + " | " + str(a_board[2][3:6]))
+    print(str(a_board[0][6:9]) + " | " + str(a_board[1][6:9]) + " | " + str(a_board[2][6:9]))
     print("------------------------------------")
-    print(str(board[3][0:3]) + " | " + str(board[4][0:3]) + " | " + str(board[5][0:3]))
-    print(str(board[3][3:6]) + " | " + str(board[4][3:6]) + " | " + str(board[5][3:6]))
-    print(str(board[3][6:9]) + " | " + str(board[4][6:9]) + " | " + str(board[5][6:9]))
+    print(str(a_board[3][0:3]) + " | " + str(a_board[4][0:3]) + " | " + str(a_board[5][0:3]))
+    print(str(a_board[3][3:6]) + " | " + str(a_board[4][3:6]) + " | " + str(a_board[5][3:6]))
+    print(str(a_board[3][6:9]) + " | " + str(a_board[4][6:9]) + " | " + str(a_board[5][6:9]))
     print("------------------------------------")
-    print(str(board[6][0:3]) + " | " + str(board[7][0:3]) + " | " + str(board[8][0:3]))
-    print(str(board[6][3:6]) + " | " + str(board[7][3:6]) + " | " + str(board[8][3:6]))
-    print(str(board[6][6:9]) + " | " + str(board[7][6:9]) + " | " + str(board[8][6:9]))
-
+    print(str(a_board[6][0:3]) + " | " + str(a_board[7][0:3]) + " | " + str(a_board[8][0:3]))
+    print(str(a_board[6][3:6]) + " | " + str(a_board[7][3:6]) + " | " + str(a_board[8][3:6]))
+    print(str(a_board[6][6:9]) + " | " + str(a_board[7][6:9]) + " | " + str(a_board[8][6:9]))
 
 if __name__ == "__main__":
     main()
