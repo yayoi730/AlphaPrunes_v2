@@ -30,7 +30,7 @@ def main():
         time.sleep(1)
         while not exists("enemy.go"):
             pass
-        time.sleep(1)
+        time.sleep(0.1)
         if startFlag:
             last_move = readMoves('first_four_moves')
             global Pnum
