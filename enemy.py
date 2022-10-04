@@ -43,6 +43,7 @@ def main():
                 Pnum = 1
                 Enum = 2
                 last_move = readMoves('first_four_moves')
+
             if os.path.getsize("move_file") != 0:
                 last_move = readMoves("move_file")
         else:
@@ -87,9 +88,10 @@ def findNextMove(last_move):
         #    takenList.append(board[last_move][i])
         if board[last_move][i] == 0:
             availableList.append(i)
-    # move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+    #move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
     move = [last_move, random.choice(availableList)]
     print("Last Move: " + str(last_move))
+    print("Chosen Move: " + str(move))
     return move
 
 def checkBoardComplete(g_board):

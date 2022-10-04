@@ -21,6 +21,7 @@ win_board = 30
 two_in_row = 10
 corner = 5
 middle = 3
+side = 1
 other_p = 0
 free_choice = -5
 # List of Sets of Possible Sequences for Boards
@@ -36,7 +37,6 @@ def main():
         time.sleep(1)
         if startFlag:
             last_move = readMoves('first_four_moves')
-            print("This is last moves " + last_move[0])
             global Pnum
             global Enum
             if last_move[0] == "AlphaPrunes":
@@ -54,6 +54,7 @@ def main():
         next_move = findNextMove(last_move)
         addMove(next_move, last_move)
         startFlag = False
+
 
 def readMoves(file):
     # reads in txt file and populates the board with the move information
@@ -75,6 +76,8 @@ def readMoves(file):
                 checkBoardComplete(int(moves[1]), complete_boards, board)
     f.close()
     return last_move
+
+
 def findNextMove(last_move):
     # function that determines the next move the player will make
     last_move = int(last_move[2])
@@ -87,6 +90,7 @@ def findNextMove(last_move):
     if complete_boards[last_move] != 0:
         last_move = random.choice(availableBoards)
         print("Changed To: " + str(last_move))
+
     for i in range(0, 9):
         # if board[last_move][i] == Pnum or board[last_move][i] == Enum:
         # takenList.append(board[last_move][i])
@@ -94,6 +98,8 @@ def findNextMove(last_move):
         if board[last_move][i] == 0:
             availableList.append(i)
     # move = [last_move, random.choice([i for i in range(0, 8) if i not in takenList])]
+
+
     move = [last_move, random.choice(availableList)]
     print("Last Move: " + str(last_move))
     print("Chosen Move: " + str(move))
@@ -300,6 +306,71 @@ def won_board_points(c_boards):
         if a_set.issubset(indices):
             points_sum += win_seq_board
     return points_sum
+
+def two_in_row(incomplete_boards, temp_board, board):
+    point_sum = 0
+    for i in incomplete_boards:  # change to incomplete boards
+        arr = temp_board[i][:]  # retrieves a board
+        a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+        # check for 2 in a rows
+        # via rows:
+        if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
+            point_sum += two_in_row
+        # via columns:
+        if (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
+            point_sum += two_in_row
+        # via diagonals:
+        if (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
+            point_sum += two_in_row
+        if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
+            point_sum += two_in_row
+    return
+def points_won(temp_board):
+    """
+    # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
+    global board
+    :param g_board: temporary global board
+    :return: points_sum: total points won by the Pnum (Player)
+    """
+    point_sum = 0
+    # TODO: create list of incomplete boards
+    incomplete_boards = np.nonzero(complete_boards)[0] # list of board indices where no player has won
+    c_boards = complete_boards.copy()                  # c_board: copy of completed_boards list
+    for g_board in incomplete_boards:                  # for every board in list of incomplete_boards
+        c_boards = checkBoardComplete(g_board, c_boards, temp_board).copy() # set board to updated list
+    incomplete_boards = c_boards.copy()
+    # TODO: determine which boards are won in sequential and sum points
+    #board_points = won_board_points(c_boards)
+    # search and sum points for two_in_row
+    #two_in_row(incomplete_boards, temp_board, board)
+
+    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
+
+        # points from corner
+    return point_sum
+
+def corner_center_side_eval_func(hypo_board_config, incomplete_boards):
+    eval_points = 0
+    for x in range(0, len(hypo_board_config)):
+        for y in range(0, len(hypo_board_config[x])):
+            if hypo_board_config[x][y] == Pnum and (y == 0 or y == 2 or y == 6 or y == 8):
+                eval_points += corner
+            elif hypo_board_config[x][y] == Pnum and (y == 1 or y == 3 or y == 5 or y == 7):
+                eval_points += side
+            elif hypo_board_config[x][y] == Pnum and (y == 4):
+                eval_points += middle
+
+    return eval_points
+
+
 def display():
     """"
     function that can be called to display the current state of the board in terms of [0, Pnum, Enum]
@@ -316,6 +387,7 @@ def display():
     print(str(board[6][0:3]) + " | " + str(board[7][0:3]) + " | " + str(board[8][0:3]))
     print(str(board[6][3:6]) + " | " + str(board[7][3:6]) + " | " + str(board[8][3:6]))
     print(str(board[6][6:9]) + " | " + str(board[7][6:9]) + " | " + str(board[8][6:9]))
+
 
 if __name__ == "__main__":
     main()
