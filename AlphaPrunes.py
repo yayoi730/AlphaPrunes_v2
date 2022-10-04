@@ -198,6 +198,9 @@ def points_won(temp_board):
     # sum points for # of boards one, and check for seq. boards
     board_points = won_board_points(c_boards)
     point_sum += board_points
+    # search and sum points for three_in_row
+    thr_points = three_in_rows(incomplete_boards, temp_board)
+    point_sum += thr_points
     # search and sum points for two_in_row
     twr_points = two_in_rows(incomplete_boards, temp_board)
     point_sum += twr_points
