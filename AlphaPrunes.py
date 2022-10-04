@@ -19,6 +19,7 @@ win_center = 40
 win_corner = 35
 win_board = 30
 two_in_row = 10
+three_in_row = 15
 corner = 5
 middle = 3
 side = 1
@@ -148,7 +149,6 @@ def minimax(moves_list, updated_board, temp_list, depth, alpha, beta, ally):
             break
             """
         return min_eval
-
 def abNextMove(last_move):
     moves_list = nextMoves(last_move)
     print("Moves List: ")
@@ -158,7 +158,7 @@ def abNextMove(last_move):
 def nextMoves(last_move):
     free_moves = []
     if complete_boards[last_move] != 0:  # check if last move was to a complete board
-        for i in range(0, 9):  # generates a list of free spaces for all uncomplete boards
+        for i in range(0, 9):            # generates a list of free spaces for all incomplete boards
             if complete_boards[i] == 0:
                 for j in range(0, 9):
                     if board[last_move][i] == 0:
@@ -213,7 +213,7 @@ def two_in_rows(incomplete_boards, temp_board):
     point_sum = 0
     for i in incomplete_boards:  # change to incomplete boards
         print(str(i))
-        arr = board[i][:]   # retrieves a board
+        arr = temp_board[i][:]   # retrieves a board
         a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
         # check for 2 in a rows
         # via rows:
@@ -236,6 +236,40 @@ def two_in_rows(incomplete_boards, temp_board):
         if (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
             point_sum += two_in_row
     return point_sum
+
+def three_in_rows(incomplete_boards, temp_board):
+    """
+    Determines the number of two in a rows Pnum (Player) has made and totals points
+    :param incomplete_boards (list of incomplete boards), temp_board: temporary global board config.
+    :return: points_sum: total points won by the Pnum (Player)
+    """
+    point_sum = 0
+    for i in incomplete_boards:  # change to incomplete boards
+        print(str(i))
+        arr = temp_board[i][:]   # retrieves a board
+        a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+        # check for 2 in a rows
+        # via rows:
+        if (a[0] == Pnum).sum() == 3 and (a[0] == Enum).sum() == 0:
+            point_sum += three_in_row
+        if (a[1] == Pnum).sum() == 3 and (a[1] == Enum).sum() == 0:
+            point_sum += three_in_row
+        if (a[2] == Pnum).sum() == 23 and (a[2] == Enum).sum() == 0:
+            point_sum += three_in_row
+        # via columns:
+        if (a[:, 0] == Pnum).sum() == 3 and (a[:, 0] == Enum).sum() == 0:
+            point_sum += three_in_row
+        if (a[:, 1] == Pnum).sum() == 3 and (a[:, 1] == Enum).sum() == 0:
+            point_sum += three_in_row
+        if (a[:, 2] == Pnum).sum() == 3 and (a[:, 2] == Enum).sum() == 0:
+            point_sum += three_in_row
+        # via diagonals:
+        if (a.diagonal() == Pnum).sum() == 3 and (a.diagonal() == Enum).sum() == 0:
+            point_sum += three_in_row
+        if (np.fliplr(a).diagonal() == Pnum).sum() == 3 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
+            point_sum += three_in_row
+    return point_sum
+
 def checkBoardComplete(g_board, c_boards, a_board):
     """
     Checks whether a board has been complete after a move and updates the global complete_boards list
