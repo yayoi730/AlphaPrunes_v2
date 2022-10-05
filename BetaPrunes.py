@@ -155,7 +155,7 @@ def minimax_starter(moves_list, updated_board, temp_list):  # takes list of pote
 
             if len(sorted_available_moves) > 4:
                 sorted_list_len = len(sorted_available_moves)
-                for l in range(0, int(sorted_list_len / 3)):
+                for l in range(0, int(sorted_list_len / 5)):
                     sorted_available_moves.pop()
 
             # returns score
