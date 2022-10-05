@@ -37,21 +37,21 @@ possible_win_states = [{0, 1, 2}, {0, 3, 6}, {0, 4, 8}, {1, 4, 7}, {3, 4, 5}, {2
 
 
 def main():
-    startFlag = True
-    while not exists("end_game"):
+    startFlag = True #startFlag is made to determine if the code is at the start, this is used to determine whether we read from move file or first four move
+    while not exists("end_game"): # checks if end game file exists if it does it ends the player
         time.sleep(1)
-        while not exists("BetaPrunes.go"):
+        while not exists("BetaPrunes.go"): # blocks the code from running unless it sees its file name.go
             pass
         time.sleep(0.1)
-        if startFlag:
-            last_move = readMoves('first_four_moves')
+        if startFlag: #if this is the start of the game
+            last_move = readMoves('first_four_moves') #read the moves and output the last move of the first four moves file
             global Pnum
             global Enum
-            if last_move[0] == "BetaPrunes":
+            if last_move[0] == "BetaPrunes": #if the last move from first four move file is ours set the player number to 2 signifying we go second
                 Pnum = 2
                 Enum = 1
                 last_move = readMoves('first_four_moves')
-            else:
+            else: #if the last move from first four move file is the enmey set the player number to 1 signifying we go first
                 Pnum = 1
                 Enum = 2
                 last_move = readMoves('first_four_moves')
@@ -59,12 +59,19 @@ def main():
                 last_move = readMoves("move_file")
         else:
             last_move = readMoves('move_file')
-        next_move = findNextMove(last_move)
-        addMove(next_move)
-        startFlag = False
+        next_move = findNextMove(last_move) #calls the findNextMove function based on the last move
+        addMove(next_move) #calls the addMove function which adds the given move to the board and move file
+        startFlag = False # sets start flag to false telling code this is no longer the first turn
 
 
 def readMoves(file):
+
+    """
+    #read file function that reads the file and adds the move to the global board and returns the last move
+    :param file: The text file that we read moves from
+    :return: the last move of the file
+    """
+
     # reads in txt file and populates the board with the move information
     # returns the last move made in a list ex: ['X'. '1' '2']
     f = open(file)
@@ -87,6 +94,11 @@ def readMoves(file):
 
 
 def addMove(next_move):
+    """
+    #adds the move to the board and writes the move to the move text file
+    :param next_move: the move to make
+
+    """
     # function that takes in the next move (int) and adds it to move_file
     board[int(next_move[0])][int(next_move[1])] = Pnum
     checkBoardComplete(next_move[0], complete_boards_list, board)
@@ -101,6 +113,11 @@ def addMove(next_move):
 
 
 def findNextMove(last_move):
+    """
+    #takes in the previous move and then calls the minimax function to find the next move
+    :param last_move: The previous move made
+    :return: move: The new move to be made
+    """
     # function that determines the next move the player will make
     print("Last Move: " + str(last_move))
     last_move_on_local = int(last_move[2])
@@ -111,6 +128,11 @@ def findNextMove(last_move):
 
 
 def sort_moves(unsorted_moves):
+    """
+    #takes in a list of unsorted moves and then uses insertion sort to sort based off the points that each move is worth
+    :param unsorted_moves: The previous move made
+    :return: sorted_moves: The sorted moves list
+    """
 
     for i in range(1, len(unsorted_moves)):
 
@@ -127,7 +149,8 @@ def sort_moves(unsorted_moves):
 
         unsorted_moves[j + 1] = key_move
 
-    return unsorted_moves
+    sorted_moves = copy.deepcopy(unsorted_moves)
+    return sorted_moves
 
 
 def minimax_starter(moves_list, updated_board, temp_list):
