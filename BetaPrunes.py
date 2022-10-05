@@ -3,20 +3,15 @@ import math
 import os
 from os.path import exists
 import time
-
 import numpy as np
-import random
-
-import pygame
 
 board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # list that stores boards that've been completed (won)
 Pnum = 0
 Enum = 0
-max_depth = 5
-move_time = 6
-depth_multiplier = 1
-# Point Weights
+move_time = 6  # time in seconds allowed per move
+depth_multiplier = 1  # depth multiplier for Iterative_Deepeming
+# Point Weights, Grading System
 lose_game = -50000
 win_game = 50000
 win_seq_board = 300
@@ -37,21 +32,23 @@ possible_win_states = [{0, 1, 2}, {0, 3, 6}, {0, 4, 8}, {1, 4, 7}, {3, 4, 5}, {2
 
 
 def main():
-    startFlag = True #startFlag is made to determine if the code is at the start, this is used to determine whether we read from move file or first four move
-    while not exists("end_game"): # checks if end game file exists if it does it ends the player
+    startFlag = True  # startFlag is made to determine if the code is at the start, this is used to determine whether we read from move file or first four move
+    while not exists("end_game"):  # checks if end game file exists if it does it ends the player
         time.sleep(1)
-        while not exists("BetaPrunes.go"): # blocks the code from running unless it sees its file name.go
+        while not exists("BetaPrunes.go"):  # blocks the code from running unless it sees its file name.go
             pass
         time.sleep(0.1)
-        if startFlag: #if this is the start of the game
-            last_move = readMoves('first_four_moves') #read the moves and output the last move of the first four moves file
+        if startFlag:  # if this is the start of the game
+            last_move = readMoves(
+                'first_four_moves')  # read the moves and output the last move of the first four moves file
             global Pnum
             global Enum
-            if last_move[0] == "BetaPrunes": #if the last move from first four move file is ours set the player number to 2 signifying we go second
+            if last_move[
+                0] == "BetaPrunes":  # if the last move from first four move file is ours set the player number to 2 signifying we go second
                 Pnum = 2
                 Enum = 1
                 last_move = readMoves('first_four_moves')
-            else: #if the last move from first four move file is the enmey set the player number to 1 signifying we go first
+            else:  # if the last move from first four move file is the enmey set the player number to 1 signifying we go first
                 Pnum = 1
                 Enum = 2
                 last_move = readMoves('first_four_moves')
@@ -59,13 +56,12 @@ def main():
                 last_move = readMoves("move_file")
         else:
             last_move = readMoves('move_file')
-        next_move = findNextMove(last_move) #calls the findNextMove function based on the last move
-        addMove(next_move) #calls the addMove function which adds the given move to the board and move file
-        startFlag = False # sets start flag to false telling code this is no longer the first turn
+        next_move = findNextMove(last_move)  # calls the findNextMove function based on the last move
+        addMove(next_move)  # calls the addMove function which adds the given move to the board and move file
+        startFlag = False  # sets start flag to false telling code this is no longer the first turn
 
 
 def readMoves(file):
-
     """
     #read file function that reads the file and adds the move to the global board and returns the last move
     :param file: The text file that we read moves from
@@ -133,22 +129,16 @@ def sort_moves(unsorted_moves):
     :param unsorted_moves: The previous move made
     :return: sorted_moves: The sorted moves list
     """
-
     for i in range(1, len(unsorted_moves)):
-
-        c_b_l = complete_boards_list.copy() #copy of list of complete boards
+        c_b_l = complete_boards_list.copy()  # copy of list of complete boards
         points_of_move = points_won(updateBoard(unsorted_moves[i], board, c_b_l, Pnum), c_b_l)
         key_point = points_of_move
         key_move = unsorted_moves[i]
         j = i - 1
-
         while j >= 0 and points_won(updateBoard(unsorted_moves[j], board, c_b_l, Enum), c_b_l) > key_point:
-
             unsorted_moves[j + 1] = unsorted_moves[j]
             j -= 1
-
         unsorted_moves[j + 1] = key_move
-
     sorted_moves = copy.deepcopy(unsorted_moves)
     return sorted_moves
 
@@ -169,7 +159,7 @@ def minimax_starter(moves_list, updated_board, temp_list):
     curr_depth = 1  # Starting depth for Iterative-Deepening Heuristic
 
     # DEPTH-ITERATIVE HEURISTIC
-    start_time = time.time() # start time for Iterative-Deepening
+    start_time = time.time()  # start time for Iterative-Deepening
     while curr_depth <= 500:
         for i in range(0, len(moves_list)):  # for every move in the move list
             # Creates a copy of the completed_boards_list
@@ -183,19 +173,20 @@ def minimax_starter(moves_list, updated_board, temp_list):
             sorted_available_moves.reverse()
 
             # Removes a number of lists
-            if len(sorted_available_moves) > 4: # if length of possible moves is greater than 4
+            if len(sorted_available_moves) > 4:  # if length of possible moves is greater than 4
                 sorted_list_len = len(sorted_available_moves)
-                for l in range(0, int(sorted_list_len / 5)): # Gets rid of the worst fifth of the list
+                for l in range(0, int(sorted_list_len / 5)):  # Gets rid of the worst fifth of the list
                     sorted_available_moves.pop()
 
             # returns score
-            score = minimax(sorted_available_moves, temp_updated_board, temp_comp_board, curr_depth, math.inf, -math.inf, False, start_time)  # finds score
+            score = minimax(sorted_available_moves, temp_updated_board, temp_comp_board, curr_depth, math.inf,
+                            -math.inf, False, start_time)  # finds score
             # break if return is None (time limit breached)
             if score == None:
                 break
-            move = moves_list[i] # set move equal to move list
+            move = moves_list[i]  # set move equal to move list
             # Check if score is greater than top_score
-            if score >= top_score: # Set top_score to current move score
+            if score >= top_score:  # Set top_score to current move score
                 top_score = score
                 final_move = move
             # Check if current_score wins game
@@ -206,6 +197,8 @@ def minimax_starter(moves_list, updated_board, temp_list):
             final_move = move
         curr_depth += curr_depth + depth_multiplier  # add depth
     return final_move
+
+
 def minimax(moves_list, updated_board, comp_boards, depth, alpha, beta, ally, start_time):
     """
     Recursive minimax implementation for traversal down a node at a given depth
@@ -224,7 +217,7 @@ def minimax(moves_list, updated_board, comp_boards, depth, alpha, beta, ally, st
         won = points_won(updated_board, comp_boards)
         return won  # checks the number of points won
     if time.time() - start_time > move_time:
-        return None # returns None when time limit has elapsed
+        return None  # returns None when time limit has elapsed
     if ally:
         # Pnum's (Player's) Turn
         max_eval = -math.inf
@@ -257,6 +250,8 @@ def minimax(moves_list, updated_board, comp_boards, depth, alpha, beta, ally, st
             if beta <= alpha:
                 break
         return min_eval
+
+
 def nextMoves(last_local_move, c_board_list, updated_board):
     """
 
@@ -277,6 +272,8 @@ def nextMoves(last_local_move, c_board_list, updated_board):
             if updated_board[last_local_move][i] == 0:
                 free_moves.append([last_local_move, i])
     return free_moves
+
+
 def updateBoard(tempMove, tempBoard, tempList, num):
     """
     Updates a given temporary board's with a given temporary move
@@ -286,10 +283,12 @@ def updateBoard(tempMove, tempBoard, tempList, num):
     :param num: Player (num) or Enemy (Enum) move
     :return: copy_board: a copy of the board
     """
-    copy_board = np.copy(tempBoard, 'K').copy() # copy board
+    copy_board = np.copy(tempBoard, 'K').copy()  # copy board
     copy_board[tempMove[0]][tempMove[1]] = num  # update board
     checkBoardComplete(tempMove[1], tempList, copy_board)
     return copy_board
+
+
 def points_won(temp_board, temp_comp_board):
     """
     # static evaluation (utility) function that returns number of points won by Pnum (Player) for any given
@@ -310,6 +309,8 @@ def points_won(temp_board, temp_comp_board):
     # evaluates individual spots on a board
     point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
     return point_sum
+
+
 def two_in_rows(incomplete_boards, temp_board):
     """
     Determines the number of two in a rows Pnum (Player) has made and totals points
@@ -360,6 +361,8 @@ def two_in_rows(incomplete_boards, temp_board):
         if (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
             point_sum += -two_in_row
     return point_sum
+
+
 def won_board_points(c_boards):
     """
     Determines the number of boards won and in what seq, adds points based on the two
@@ -420,6 +423,8 @@ def won_board_points(c_boards):
     if 4 in Enum_boards:
         points_sum -= win_center
     return points_sum
+
+
 def corner_center_side_eval_func(hypo_board_config):
     """
     Function that returns points based on local board configuration. Considers corner, sides, and middles.
@@ -445,14 +450,16 @@ def corner_center_side_eval_func(hypo_board_config):
             elif hypo_board_config[x][y] == Enum and (y == 4):
                 eval_points -= middle
     return eval_points
+
+
 def checkBoardComplete(g_board, c_boards, a_board):
     """
     Checks whether a board has been complete after a move and updates the global complete_boards list
     :param g_board, c_boards (list of complete boards), a_board (global board config).
     :return: list of complete boards where 0 = incomplete, Pnum (won by Player), Enum (won by Enemy) or 3 (tiee)
     """
-    arr = a_board[g_board][:]     # retrieves array size = 9 at location g_board in a_board
-    a = np.reshape(arr, (3, 3))    # shapes it into 3x3 matrix
+    arr = a_board[g_board][:]  # retrieves array size = 9 at location g_board in a_board
+    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
     # Checks that the sum of Pnum is equal to 3 or that the sum of Enum is equal to 3 in a row, column, or diagonal layout
     # Sets corresponding index in complete_boards_list equal to Pnum, Enum, or 3 (tie)
     # check rows:
@@ -502,7 +509,9 @@ def checkBoardComplete(g_board, c_boards, a_board):
     elif np.all(a):
         # returns true if and only if every value isn't zero in the array
         c_boards[g_board] = 3
-    return c_boards # return list of completed boards
+    return c_boards  # return list of completed boards
+
+
 def display(a_board):
     """
     function that can be called to display the current state of the board in terms of [0, Pnum, Enum] in a 3x3 matrix (global board)
@@ -522,6 +531,7 @@ def display(a_board):
     print(str(a_board[6][0:3]) + " | " + str(a_board[7][0:3]) + " | " + str(a_board[8][0:3]))
     print(str(a_board[6][3:6]) + " | " + str(a_board[7][3:6]) + " | " + str(a_board[8][3:6]))
     print(str(a_board[6][6:9]) + " | " + str(a_board[7][6:9]) + " | " + str(a_board[8][6:9]))
+
 
 if __name__ == "__main__":
     main()
