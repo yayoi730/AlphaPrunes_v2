@@ -16,7 +16,7 @@ the official documentation for the libraries.
 I can guarantee this program will work for Python 3.9 and up. 
 Please check that are you using a valid version of python.
 You can check your version with `python --version` and/or `python3 --version`.
-You may need to use `python` or `python3` or even `python3.9` 
+You may need to use `python` or `python3` or even `python
 to properly run the program depending on how your system handled Python and if you are using an IDE.
 I will use `python` in the README for simplicity.
 

@@ -193,8 +193,8 @@ def minimax_starter(moves_list, updated_board, temp_list):
             if score >= win_game:
                 final_move = move
         # Check if current_score wins game
-        if score >= win_game:
-            final_move = move
+        #if score >= win_game:
+        #    final_move = move
         curr_depth += curr_depth + depth_multiplier  # add depth
     return final_move
 
@@ -307,7 +307,7 @@ def points_won(temp_board, temp_comp_board):
     twr_points = two_in_rows(incomplete_boards, temp_board)
     point_sum += twr_points
     # evaluates individual spots on a board
-    point_sum += corner_center_side_eval_func(temp_board, incomplete_boards)
+    point_sum += corner_center_side_eval_func(temp_board)
     return point_sum
 
 
