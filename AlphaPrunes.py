@@ -112,7 +112,8 @@ def minimax_starter(moves_list, updated_board, temp_list): #takes list of potent
     for i in range(0, len(moves_list)): #every potential move
         temp_comp_board = np.copy(temp_list, 'K')
         temp_updated_board = updateBoard(moves_list[i], c_updated_board, temp_comp_board, Pnum)  # gets board with next move on it and updates temp list
-        score = minimax(nextMoves(moves_list[i][1], temp_comp_board, temp_updated_board), temp_updated_board, temp_comp_board, Depth, math.inf, -math.inf, False)  # finds score
+        unsorted_available_moves = nextMoves(moves_list[i][1], temp_comp_board, temp_updated_board).copy()
+        score = minimax(unsorted_available_moves, temp_updated_board, temp_comp_board, Depth, math.inf, -math.inf, False)  # finds score
         print("Move - [" + str(moves_list[i]) + "] - score - " + str(score))
         if score > top_score:
             top_score = score

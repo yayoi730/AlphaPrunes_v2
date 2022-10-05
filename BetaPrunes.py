@@ -1,3 +1,4 @@
+import copy
 import math
 import os
 from os.path import exists
@@ -13,7 +14,7 @@ complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # list that stores boards th
 Pnum = 0
 Enum = 0
 max_depth = 5
-move_time = 7
+move_time = 6
 depth_multiplier = 1
 # Point Weights
 lose_game = -50000
@@ -109,9 +110,28 @@ def findNextMove(last_move):
     return move
 
 
+def sort_moves(unsorted_moves):
+
+    for i in range(1, len(unsorted_moves)):
+
+        c_b_l = complete_boards_list.copy() #copy of list of complete boards
+        points_of_move = points_won(updateBoard(unsorted_moves[i], board, c_b_l, Pnum), c_b_l)
+        key_point = points_of_move
+        key_move = unsorted_moves[i]
+        j = i - 1
+
+        while j >= 0 and points_won(updateBoard(unsorted_moves[j], board, c_b_l, Enum), c_b_l) > key_point:
+
+            unsorted_moves[j + 1] = unsorted_moves[j]
+            j -= 1
+
+        unsorted_moves[j + 1] = key_move
+
+    return unsorted_moves
+
+
 # Works
-def minimax_starter(moves_list, updated_board,
-                    temp_list):  # takes list of potential moves, the board, and list of complete boards
+def minimax_starter(moves_list, updated_board, temp_list):  # takes list of potential moves, the board, and list of complete boards
     final_move = []  # move that AI will choose
     top_score = -math.inf  # set negative so AI will pick a move
     c_updated_board = updated_board.copy()
@@ -127,11 +147,19 @@ def minimax_starter(moves_list, updated_board,
             # Creates a copy of the completed_boards_list
             temp_comp_board = np.copy(c_temp_list, 'K')
             # gets board with next move on it and updates temp list
-            temp_updated_board = updateBoard(moves_list[i], c_updated_board, temp_comp_board,
-                                             Pnum)
+            temp_updated_board = updateBoard(moves_list[i], c_updated_board, temp_comp_board, Pnum)
+
+            unsorted_available_moves = copy.deepcopy(nextMoves(moves_list[i][1], temp_comp_board, temp_updated_board))
+            sorted_available_moves = copy.deepcopy(sort_moves(unsorted_available_moves))
+            sorted_available_moves.reverse()
+
+            if len(sorted_available_moves) > 4:
+                sorted_list_len = len(sorted_available_moves)
+                for l in range(0, int(sorted_list_len / 3)):
+                    sorted_available_moves.pop()
+
             # returns score
-            score = minimax(nextMoves(moves_list[i][1], temp_comp_board, temp_updated_board), temp_updated_board,
-                            temp_comp_board, curr_depth, math.inf, -math.inf, False, start_time)  # finds score
+            score = minimax(sorted_available_moves, temp_updated_board, temp_comp_board, curr_depth, math.inf, -math.inf, False, start_time)  # finds score
             # break if return is None (time limit breached)
             if score == None:
                 break
@@ -147,8 +175,8 @@ def minimax_starter(moves_list, updated_board,
             if score >= win_game:
                 final_move = move
         # Check if current_score wins game
-        if score >= win_game:
-            final_move = move
+        #if score >= win_game:
+        #    final_move = move
         curr_depth += curr_depth + depth_multiplier  # add depth
     return final_move
 
