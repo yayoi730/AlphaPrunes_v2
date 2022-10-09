@@ -323,7 +323,7 @@ def points_won(temp_board, temp_list_of_comp_boards):
 
 # Utility Helper Functions:
 def won_board_points(temp_list_of_comp_boards):
-    # TODO: verify works as planned
+    # TODO: verify works as planned with random agent
     """
     Determines and adds points based on the number of boards won, in what sequence and in what location;.
     Function ends early if Loss or Win is detected.
@@ -352,8 +352,8 @@ def won_board_points(temp_list_of_comp_boards):
     # if game has not ended, continue scoring points
     if not game_end:
         # Add and Subtract points based on winning players
-        points_sum += (len(Pnum_boards) * win_board)
-        points_sum -= (len(Enum_boards) * win_board)
+        points_sum += len(Pnum_boards) * win_board
+        points_sum -= len(Enum_boards) * win_board
         # Check for seq. boards
         for a_set2 in possible_two_seq:
             # Checks Pnum's seq. boards
@@ -377,7 +377,7 @@ def won_board_points(temp_list_of_comp_boards):
 
 
 def two_in_rows(incomplete_boards, temp_board):
-    # TODO: verify works as planned
+    # TODO: verify works as planned with random agent
     """
     Determines the number of two in a rows Pnum (Player) has made (+ points) and Enum has made (- points)
     :param incomplete_boards (list of incomplete boards), temp_board: temporary global board config.
@@ -430,7 +430,7 @@ def two_in_rows(incomplete_boards, temp_board):
 
 
 def corner_center_side_eval_func(temp_board):
-    # TODO: verify works as planned
+    # TODO: verify works as planned with random agent
     """
     Function that returns points based on local board configuration. Considers corner, sides, and middles.
     Adds (Pnum) and Subtracts (Enum) based on who is on the board
@@ -459,7 +459,7 @@ def corner_center_side_eval_func(temp_board):
 
 # Other Helper Functions
 def check_board_complete(g_board, list_of_complete_boards, a_board):
-    # TODO: verify works as planned
+    # TODO: verify works as planned with random agent, check edge cases
     """
     Checks whether a board has been complete after a move and updates the global complete_boards list
     :param g_board, list of complete boards, a_board (global board config).
