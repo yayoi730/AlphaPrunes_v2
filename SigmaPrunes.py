@@ -12,7 +12,7 @@ board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # list that stores indices of completed (won) boards
 Pnum = 2
 Enum = 1
-depth = 2
+depth = 4
 # Point Weights, Grading System for Moves:
 lose_game = -50000
 win_game = 50000
@@ -287,10 +287,12 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
         # currently picks random from available boards
         unpopulated_boards = [x for x, n in enumerate(curr_list_of_c_boards) if
                               n == 0]  # returns indices of all unpopulated boards
+        print("UNPOPULATED BOARDS: " + str(unpopulated_boards))
+        # TODO: FIND OUT WHY UNPOPULATED BOARDS [ ] and fix
         g_board = random.choice(unpopulated_boards)
         all_local_moves = curr_board[g_board][:]
         possible_moves_list = [x for x, n in enumerate(all_local_moves) if
-                               n == 0]  # returns indices of all unpopulated grids within chosen_board
+                                   n == 0]  # returns indices of all unpopulated grids within chosen_board
     return [possible_moves_list, g_board]
 
 
