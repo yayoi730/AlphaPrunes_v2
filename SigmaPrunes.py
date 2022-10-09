@@ -12,17 +12,19 @@ board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # list that stores indices of completed (won) boards
 Pnum = 2
 Enum = 1
-# Point Weights, Grading System for Moves:
 depth = 2
+# Point Weights, Grading System for Moves:
 lose_game = -50000
 win_game = 50000
+win_board = 300
+# Bonus Points Based on What and Whero Board is Won:
 win_seq_board = 250
-win_center = 100
-win_corner = 75
-win_board = 200
-two_in_row = 30
+win_center = 200
+win_corner = 175
+# Other Points
+two_in_row = 100
 corner = 5
-middle = 24
+middle = 15
 side = 1
 other_p = 0
 free_choice = -5
