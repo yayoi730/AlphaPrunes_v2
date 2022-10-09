@@ -16,13 +16,13 @@ Enum = 1
 depth = 2
 lose_game = -50000
 win_game = 50000
-win_seq_board = 200
+win_seq_board = 250
 win_center = 100
 win_corner = 75
 win_board = 200
 two_in_row = 30
 corner = 5
-middle = 30
+middle = 24
 side = 1
 other_p = 0
 free_choice = -5
@@ -307,6 +307,7 @@ def points_won(temp_board, temp_list_of_comp_boards):
     incomplete_boards = [x for x, n in enumerate(temp_list_of_comp_boards) if n == 0]
     # sum points for # of boards one, and check for seq. boards + returns state of game
     board_points, game_end = won_board_points(temp_list_of_comp_boards)
+    point_sum += board_points
     # If game hasn't ended, continue calculating # of points won
     if not game_end:
         point_sum += board_points
@@ -339,11 +340,13 @@ def won_board_points(temp_list_of_comp_boards):
         if a_set1.issubset(Pnum_boards):
             game_end = True
             points_sum += win_game
+            print("GAME WON DETECTED")
             break
         # Check's if Enum has won
         if a_set1.issubset(Enum_boards):
             game_end = True
             points_sum += lose_game
+            print("GAME LOST DETECTED")
             break
     # if game has not ended, continue scoring points
     if not game_end:
