@@ -13,7 +13,7 @@ complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 Pnum = 0
 Enum = 0
 # Point Weights
-Depth = 2
+Depth = 5
 lose_game = -50000
 win_game = 50000
 win_seq_board = 200
