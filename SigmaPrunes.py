@@ -324,6 +324,25 @@ def board_heuristic(incomplete_boards, temp_board):
         point_sum += two_in_row
     elif (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
         point_sum += two_in_row
+    # enemy
+    if (a[0] == Enum).sum() == 2 and (a[0] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[1] == Enum).sum() == 2 and (a[1] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[2] == Enum).sum() == 2 and (a[2] == Pnum).sum() == 0:
+        point_sum += 1
+    # via columns:
+    elif (a[:, 0] == Enum).sum() == 2 and (a[:, 0] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[:, 1] == Enum).sum() == 2 and (a[:, 1] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[:, 2] == Enum).sum() == 2 and (a[:, 2] == Pnum).sum() == 0:
+        point_sum += 1
+    # via diagonals:
+    elif (a.diagonal() == Enum).sum() == 2 and (a.diagonal() == Pnum).sum() == 0:
+        point_sum += 1
+    elif (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
+        point_sum += 1
 
     return point_sum
 # Utility Functions:
