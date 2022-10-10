@@ -145,7 +145,7 @@ def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally)
     :param ally: Pnum's move (true)
     :return: best_move, score: best move and associated score in tuple
     """
-    if depth == 0:
+    if depth == 0 or curr_list_c_boards.count(0) == 0:
         total_points_won = points_won(curr_board, curr_list_c_boards)
         return [last_move, total_points_won]
     # TODO: implement time_constraint
