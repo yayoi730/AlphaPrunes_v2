@@ -12,7 +12,7 @@ board = np.zeros((9, 9))  # stores the moves that have been played
 complete_boards_list = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # list that stores indices of completed (won) boards
 Pnum = 2
 Enum = 1
-depth = 5
+move_time = 5
 # Point Weights, Grading System for Moves:
 lose_game = -50000
 win_game = 50000
@@ -41,7 +41,7 @@ def main():
     startFlag = True
     while not exists("end_game"):  # checks if end game file exists, ends game if true
         time.sleep(1)
-        while not exists("DeltaPrunes.go"):  # blocks the code from running unless it sees its: name.go
+        while not exists("DeepeningPrunes.go"):  # blocks the code from running unless it sees its: name.go
             pass
         time.sleep(0.1)
         if startFlag:  # if this is the start of the game
@@ -75,7 +75,7 @@ def read_moves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'DeltaPrunes':
+            if moves[0] == 'DeepeningPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
                 check_board_complete(int(moves[1]), complete_boards_list, board)
             else:
@@ -91,13 +91,12 @@ def add_move(next_move):
     :param next_move: the move to make
     """
     # function that takes in the next move (int) and adds it to move_file
-    print("DeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     board[next_move[0]][next_move[1]] = Pnum
     check_board_complete(next_move[0], complete_boards_list, board)
     file = open('move_file', 'r+')
     # read in the move from the other player here...
     file.seek(0)
-    file.write("DeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    file.write("DeepeningPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     file.truncate()
     file.close()
     print("---------------------")
@@ -110,7 +109,6 @@ def find_next_move(last_move):
     :return: best_move: the next move based on minimax
     """
     # function that determines the next move the player will make
-    print("Last Move: " + str(last_move))
     last_move = [int(last_move[1]), int(last_move[2])]  # Change into tuple of ints: [g_board, l_board]
     best_move = minimax_starter(last_move)
     return best_move
@@ -128,12 +126,23 @@ def minimax_starter(last_move):
     copy_curr_list_c_boards = complete_boards_list.copy()
     # Calls minimax
     # TODO: Implement Iterative Deepening over this w/ time_constraint
-    best_move, score = minimax(copy_board, copy_curr_list_c_boards, last_move, depth, -math.inf, math.inf, True)
+    start_time = time.time()
+    best_move = None
+    score = -math.inf
+    depth = 1
+    while (time.time() - start_time) < (move_time+0.50) and depth < 5:
+        print("AT DEPTH: " + str(depth))
+        try:
+            best_move, score = minimax(copy_board, copy_curr_list_c_boards, last_move, depth, -math.inf, math.inf,
+                                          True, start_time)
+            depth += 1
+        except TypeError:
+            break
     return best_move
 
 
 # Minimax + Helper Functions
-def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally):
+def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally, start_time):
     """
     Minimax
     :param curr_board: current global board configuration
@@ -143,67 +152,26 @@ def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally)
     :param alpha: -inf. for pruning
     :param beta:  +inf. for pruning
     :param ally: Pnum's move (true)
+    :param start_time:
     :return: best_move, score: best move and associated score in tuple
     """
-    if depth == 0 or curr_list_c_boards.count(0) == 0:
-        total_points_won = points_won(curr_board, curr_list_c_boards)
-        return [last_move, total_points_won]
-    # TODO: implement time_constraint
-    if ally:
-        best_move, max_score = max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, not ally)
-        return [best_move, max_score]
-    else:
-        best_move, min_score = min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally)
-        return [best_move, min_score]
-    return [best_move, score]
+    while time.time() - start_time < move_time:
+        if depth == 0 or curr_list_c_boards.count(0) == 0:
+            total_points_won = points_won(curr_board, curr_list_c_boards)
+            return [last_move, total_points_won]
+        # TODO: implement time_constraint
+        if ally:
+            best_move, max_score = max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, not ally,
+                                             start_time)
+            return [best_move, max_score]
+        else:
+            best_move, min_score = min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally,
+                                             start_time)
+            return [best_move, min_score]
+        return [best_move, score]
 
-def board_heuristic(incomplete_boards, temp_board):
-    point_sum = 0
-    i = incomplete_boards
-    arr = temp_board[i][:]  # retrieves a board
-    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
-    # check for 2 in a rows
-    # via rows:
-    if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
-        point_sum += two_in_row
-    elif (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
-        point_sum += two_in_row
-    elif (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
-        point_sum += two_in_row
-    # via columns:
-    elif (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
-        point_sum += two_in_row
-    elif (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
-        point_sum += two_in_row
-    elif (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
-        point_sum += two_in_row
-    # via diagonals:
-    elif (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
-        point_sum += two_in_row
-    elif (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
-        point_sum += two_in_row
-    # enemy
-    if (a[0] == Enum).sum() == 2 and (a[0] == Pnum).sum() == 0:
-        point_sum += 1
-    elif (a[1] == Enum).sum() == 2 and (a[1] == Pnum).sum() == 0:
-        point_sum += 1
-    elif (a[2] == Enum).sum() == 2 and (a[2] == Pnum).sum() == 0:
-        point_sum += 1
-    # via columns:
-    elif (a[:, 0] == Enum).sum() == 2 and (a[:, 0] == Pnum).sum() == 0:
-        point_sum += 1
-    elif (a[:, 1] == Enum).sum() == 2 and (a[:, 1] == Pnum).sum() == 0:
-        point_sum += 1
-    elif (a[:, 2] == Enum).sum() == 2 and (a[:, 2] == Pnum).sum() == 0:
-        point_sum += 1
-    # via diagonals:
-    elif (a.diagonal() == Enum).sum() == 2 and (a.diagonal() == Pnum).sum() == 0:
-        point_sum += 1
-    elif (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
-        point_sum += 1
-    return point_sum
 
-def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally):
+def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally, start_time):
     """
     Returns a valid move with the highest point sum calculated by points_won() given a last move
     :param curr_board: current global board configuration
@@ -217,15 +185,15 @@ def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
     """
     best_move = None
     # Generate list of possible moves + on what g_board
-    list_of_possible_moves, g_board = generate_list_of_moves(curr_board, curr_list_c_boards, last_move)
+    list_of_possible_moves, g_board = generate_list_of_moves(curr_board, curr_list_c_boards,
+                                                             last_move)
 
-
-    print("unsorted moves: " + str(list_of_possible_moves))
-    sort_move_list(list_of_possible_moves, g_board, 0, len(list_of_possible_moves) - 1, curr_board, curr_list_c_boards, ally)
+    # print("unsorted moves: " + str(list_of_possible_moves))
+    sort_move_list(list_of_possible_moves, g_board, 0, len(list_of_possible_moves) - 1, curr_board,
+                       curr_list_c_boards, ally)
     shave_move_list(list_of_possible_moves, 4)
-    print("sorted moves: " + str(list_of_possible_moves))
+    # print("sorted moves: " + str(list_of_possible_moves))
 
-    # print("MAX List of Moves on " + str(g_board) + " : " + str(list_of_possible_moves))
     # EVALUATION OF MOVES
     max_score = -math.inf
     for move in list_of_possible_moves:
@@ -235,22 +203,23 @@ def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
                                                           chosen_move,
                                                           not ally)  # currently ally = false, false(false(ally)) = True = Pnum
         # Calculate Min Scores Among Those Moves
-        min_move, score = minimax(u_curr_board, u_curr_list_c_boards, chosen_move, depth - 1, alpha, beta, ally)
-        # Find The Highest Score
-        if score > max_score:
-            max_score = score
-            best_move = chosen_move
-        print("Move - [" + str(chosen_move) + "] - score - " + str(score))
-        # alpha-beta pruning
-        alpha = max(alpha, score)
-        if beta <= alpha:
-            break
-    print("Best Move - [" + str(best_move) + "] - score - " + str(score))
-    print("---------------------------------")
+        try:
+            min_move, score = minimax(u_curr_board, u_curr_list_c_boards, chosen_move, depth - 1, alpha, beta, ally,
+                                  start_time)
+            # Find The Highest Score
+            if score > max_score:
+                max_score = score
+                best_move = chosen_move
+            # alpha-beta pruning
+            alpha = max(alpha, score)
+            if beta <= alpha:
+                break
+        except TypeError:
+            pass
     return [best_move, max_score]
 
 
-def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally):
+def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally, start_time):
     """
     Returns a valid move with the lowest point sum calculated by points_won() given a last move
     :param curr_board: current global board configuration
@@ -264,8 +233,10 @@ def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
     """
     best_move = None
     # Generate list of possible moves + on what g_board
-
     list_of_possible_moves, g_board = generate_list_of_moves(curr_board, curr_list_c_boards.copy(), last_move)
+    # EVALUATION OF MOVES
+    min_score = math.inf
+
 
     print("unsorted moves: " + str(list_of_possible_moves))
     sort_move_list(list_of_possible_moves, g_board, 0, len(list_of_possible_moves) - 1, curr_board,
@@ -273,8 +244,6 @@ def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
     shave_move_list(list_of_possible_moves, 4)
     print("sorted moves: " + str(list_of_possible_moves))
 
-    # EVALUATION OF MOVES
-    min_score = math.inf
     for move in list_of_possible_moves:
         chosen_move = [g_board, move]
         # Update Board with Chosen Move
@@ -282,22 +251,23 @@ def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
                                                           chosen_move,
                                                           ally)
         # Calculate Max Score Among Those Moves
-        max_move, score = minimax(u_curr_board, u_curr_list_c_boards, chosen_move, depth - 1, alpha, beta,
-                                  not ally)  # currently ally = true, false(ally)) = False = Enum
-        print("Move - [" + str(chosen_move) + "] - score - " + str(score))
-        # Find The Lowest Score
-        if score < min_score:
-            min_score = score
-            best_move = chosen_move
-        # alpha-beta pruning
-        beta = min(beta, score)
-        if beta <= alpha:
-            break
-    print("Chosen Move - [" + str(best_move) + "] - score - " + str(score))
-    print("---------------------------------")
+        try:
+            max_move, score = minimax(u_curr_board, u_curr_list_c_boards, chosen_move, depth - 1, alpha, beta,
+                                      not ally, start_time)  # currently ally = true, false(ally)) = False = Enum
+            # Find The Lowest Score
+            if score < min_score:
+                min_score = score
+                best_move = chosen_move
+            # alpha-beta pruning
+            beta = min(beta, score)
+            if beta <= alpha:
+                break
+        except TypeError:
+            pass
     return [best_move, min_score]
 
 
+# Helper Functions for Minimax:
 def points_from_move(move, curr_board, curr_list_of_c_boards, ally):
     updated_board, updated_list_of_c_boards = update_board(curr_board, curr_list_of_c_boards, move, ally)
     return points_won(updated_board, updated_list_of_c_boards)
@@ -345,8 +315,8 @@ def shave_move_list(sorted_moves_list, shave_num):
         for l in range(0, int(sorted_list_len / shave_num)):  # Gets rid of the worst fifth of the list
             sorted_moves_list.pop()
 
-
-# Helper Functions for Minimax:
+# TODO: sort list of moves based on non-terminal utility function (use faster sort method, like Greedy(?))
+# TODO: remove undesirable moves from sorted list (how to determine this?
 def update_board(curr_board, curr_list_of_c_boards, last_move, ally):
     """
     Returns an updated board and list of completed boards given a move and bool representing who made it:
@@ -391,7 +361,6 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
         # chooses board with 2 in a row, otherwise chooses first available
         unpopulated_boards = [x for x, n in enumerate(curr_list_of_c_boards) if
                               n == 0]  # returns indices of all unpopulated boards
-        print("UNPOPULATED BOARDS: " + str(unpopulated_boards))
         best_board = [0, -1]
         for un_board in unpopulated_boards:
             points = board_heuristic(un_board, curr_board)
@@ -403,7 +372,51 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
                                n == 0]  # returns indices of all unpopulated grids within chosen_board
     return [possible_moves_list, g_board]
 
-
+def board_heuristic(incomplete_boards, temp_board):
+    point_sum = 0
+    i = incomplete_boards
+    arr = temp_board[i][:]  # retrieves a board
+    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+    # check for 2 in a rows
+    # via rows:
+    if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
+        point_sum += two_in_row
+    # via columns:
+    elif (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
+        point_sum += two_in_row
+    # via diagonals:
+    elif (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
+        point_sum += two_in_row
+    # enemy
+    if (a[0] == Enum).sum() == 2 and (a[0] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[1] == Enum).sum() == 2 and (a[1] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[2] == Enum).sum() == 2 and (a[2] == Pnum).sum() == 0:
+        point_sum += 1
+    # via columns:
+    elif (a[:, 0] == Enum).sum() == 2 and (a[:, 0] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[:, 1] == Enum).sum() == 2 and (a[:, 1] == Pnum).sum() == 0:
+        point_sum += 1
+    elif (a[:, 2] == Enum).sum() == 2 and (a[:, 2] == Pnum).sum() == 0:
+        point_sum += 1
+    # via diagonals:
+    elif (a.diagonal() == Enum).sum() == 2 and (a.diagonal() == Pnum).sum() == 0:
+        point_sum += 1
+    elif (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
+        point_sum += 1
+    return point_sum
 # Utility Functions:
 def points_won(temp_board, temp_list_of_comp_boards):
     """
@@ -433,6 +446,7 @@ def points_won(temp_board, temp_list_of_comp_boards):
 
 # Utility Helper Functions:
 def won_board_points(temp_list_of_comp_boards):
+    # TODO: verify works as planned
     """
     Determines and adds points based on the number of boards won, in what sequence and in what location;.
     Function ends early if Loss or Win is detected.
@@ -483,7 +497,10 @@ def won_board_points(temp_list_of_comp_boards):
             if i == 4:
                 points_sum -= win_center
     return [points_sum, game_end]
+
+
 def two_in_rows(incomplete_boards, temp_board):
+    # TODO: verify works as planned
     """
     Determines the number of two in a rows Pnum (Player) has made (+ points) and Enum has made (- points)
     :param incomplete_boards (list of incomplete boards), temp_board: temporary global board config.
@@ -533,7 +550,10 @@ def two_in_rows(incomplete_boards, temp_board):
         if (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
             point_sum += -two_in_row
     return point_sum
+
+
 def corner_center_side_eval_func(temp_board):
+    # TODO: verify works as planned
     """
     Function that returns points based on local board configuration. Considers corner, sides, and middles.
     Adds (Pnum) and Subtracts (Enum) based on who is on the board
@@ -558,8 +578,11 @@ def corner_center_side_eval_func(temp_board):
             elif temp_board[x][y] == Enum and (y == 4):
                 points_sum -= middle
     return points_sum
+
+
 # Other Helper Functions
 def check_board_complete(g_board, list_of_complete_boards, a_board):
+    # TODO: verify works as planned
     """
     Checks whether a board has been complete after a move and updates the global complete_boards list
     :param g_board, list of complete boards, a_board (global board config).
@@ -621,6 +644,8 @@ def check_board_complete(g_board, list_of_complete_boards, a_board):
         # returns true if and only if every value isn't zero in the array
         list_of_complete_boards[g_board] = 3
     return list_of_complete_boards  # return list of completed boards
+
+
 def display(a_board):
     """
     function that can be called to display the current state of the board in terms of [0, Pnum, Enum] in a 3x3 matrix (global board)
@@ -640,5 +665,7 @@ def display(a_board):
     print(str(a_board[6][0:3]) + " | " + str(a_board[7][0:3]) + " | " + str(a_board[8][0:3]))
     print(str(a_board[6][3:6]) + " | " + str(a_board[7][3:6]) + " | " + str(a_board[8][3:6]))
     print(str(a_board[6][6:9]) + " | " + str(a_board[7][6:9]) + " | " + str(a_board[8][6:9]))
+
+
 if __name__ == "__main__":
     main()
