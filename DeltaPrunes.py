@@ -41,7 +41,7 @@ def main():
     startFlag = True
     while not exists("end_game"):  # checks if end game file exists, ends game if true
         time.sleep(1)
-        while not exists("SigmaPrunes.go"):  # blocks the code from running unless it sees its: name.go
+        while not exists("DeltaPrunes.go"):  # blocks the code from running unless it sees its: name.go
             pass
         time.sleep(0.1)
         if startFlag:  # if this is the start of the game
@@ -75,7 +75,7 @@ def read_moves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'SigmaPrunes':
+            if moves[0] == 'DeltaPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
                 check_board_complete(int(moves[1]), complete_boards_list, board)
             else:
@@ -91,13 +91,13 @@ def add_move(next_move):
     :param next_move: the move to make
     """
     # function that takes in the next move (int) and adds it to move_file
-    print("SigmaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    print("DeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     board[next_move[0]][next_move[1]] = Pnum
     check_board_complete(next_move[0], complete_boards_list, board)
     file = open('move_file', 'r+')
     # read in the move from the other player here...
     file.seek(0)
-    file.write("SigmaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    file.write("DeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     file.truncate()
     file.close()
     print("---------------------")
