@@ -145,7 +145,7 @@ def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally)
     :param ally: Pnum's move (true)
     :return: best_move, score: best move and associated score in tuple
     """
-    if depth == 0:
+    if depth == 0 or curr_list_c_boards.count(0) == 0:
         total_points_won = points_won(curr_board, curr_list_c_boards)
         return [last_move, total_points_won]
     # TODO: implement time_constraint
@@ -284,18 +284,48 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
         g_board = l_board
     else:
         # TODO: FREE-CHOICE HEURISTIC FUNCTION
-        # currently picks random from available boards
+        # chooses board with 2 in a row, otherwise chooses first available
         unpopulated_boards = [x for x, n in enumerate(curr_list_of_c_boards) if
                               n == 0]  # returns indices of all unpopulated boards
         print("UNPOPULATED BOARDS: " + str(unpopulated_boards))
-        # TODO: FIND OUT WHY UNPOPULATED BOARDS [ ] and fix
-        g_board = random.choice(unpopulated_boards)
+        best_board = [0, -1]
+        for un_board in unpopulated_boards:
+            points = board_heuristic(un_board, curr_board)
+            if points > best_board[1]:
+                best_board = [un_board, points]
+        g_board = best_board[0]
         all_local_moves = curr_board[g_board][:]
         possible_moves_list = [x for x, n in enumerate(all_local_moves) if
                                    n == 0]  # returns indices of all unpopulated grids within chosen_board
     return [possible_moves_list, g_board]
 
+def board_heuristic(incomplete_boards, temp_board):
+    point_sum = 0
+    i = incomplete_boards
+    arr = temp_board[i][:]  # retrieves a board
+    a = np.reshape(arr, (3, 3))  # shapes it into 3x3 matrix
+    # check for 2 in a rows
+    # via rows:
+    if (a[0] == Pnum).sum() == 2 and (a[0] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[1] == Pnum).sum() == 2 and (a[1] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[2] == Pnum).sum() == 2 and (a[2] == Enum).sum() == 0:
+        point_sum += two_in_row
+    # via columns:
+    elif (a[:, 0] == Pnum).sum() == 2 and (a[:, 0] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[:, 1] == Pnum).sum() == 2 and (a[:, 1] == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (a[:, 2] == Pnum).sum() == 2 and (a[:, 2] == Enum).sum() == 0:
+        point_sum += two_in_row
+    # via diagonals:
+    elif (a.diagonal() == Pnum).sum() == 2 and (a.diagonal() == Enum).sum() == 0:
+        point_sum += two_in_row
+    elif (np.fliplr(a).diagonal() == Pnum).sum() == 2 and (np.fliplr(a).diagonal() == Enum).sum() == 0:
+        point_sum += two_in_row
 
+    return point_sum
 # Utility Functions:
 def points_won(temp_board, temp_list_of_comp_boards):
     """
