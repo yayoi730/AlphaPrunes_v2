@@ -91,7 +91,7 @@ def add_move(next_move):
     :param next_move: the move to make
     """
     # function that takes in the next move (int) and adds it to move_file
-    print("SigmaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    print("DeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     board[next_move[0]][next_move[1]] = Pnum
     check_board_complete(next_move[0], complete_boards_list, board)
     file = open('move_file', 'r+')
