@@ -1,76 +1,27 @@
-Hello CS 4341 A22!
+# CS4331 - Project 2 - Tournament Edition
 
-Below is information about using the Referee we are providing for project 2.
-_________________________________________________________________________________
+## ORIGINAL PLAYER: BetaPrunes 
+## NEW PLAYER: DeepDeltaPrunes
 
-# Dependencies and Python Version
+## Timeline of Improvements:
 
-This is the referee program for the Ultimate Tic Tac Toe (UTTT) AI for Project 2. 
-The details of how your programs need to communicate with the referee are on Canvas.
+### Construction of SigmaPrunes
+The agent, BetaPrunes, that we submitted for grading did not implement a fully-recursive minimax. Before making any improvements, we chose to redo our MiniMax algorithm to make it recursive and clean up the rest of our program as well, we dubbed it SigmaPrunes. Once we redid our MiniMax algorithm, the edited agent SigmaPrunes, kept beating our initial agent BetaPrunes.  
 
-The referee has two dependencies, `numpy` and `pygame`. Please install these with 
-`pip install numpy` and `python3 -m pip install -U pygame --user`. 
-If there are issues with installing, please refer to
-the official documentation for the libraries.
+### Free-Choice Heuristic (SigmaPrunes V.2) 
+Initially, upon having to choose a global board to make a move on, our agent chose randomly.
+We implemented a heuristic that makes the agent choose a board that has it already has a 2
+in a row in, after this our new agent consistently and quickly beat our old agent.
 
-I can guarantee this program will work for Python 3.9 and up. 
-Please check that are you using a valid version of python.
-You can check your version with `python --version` and/or `python3 --version`.
-You may need to use `python` or `python3` or even `python
-to properly run the program depending on how your system handled Python and if you are using an IDE.
-I will use `python` in the README for simplicity.
+### Heuristic Sort Improvement (DeltaPrunes)
+For our initial Heuristic sort in BetaPrunes we used a merge sort algorithm to sort the list of available moves that we were feeding to the minimax function. We were also sorting only the initial moves outside of the minimax algorithm. The first way we improved this was by placing where we sorted the available moves inside of the minimax recursion that way it appropriately sorts the moves at each depth. Next we changed the sorting algorithm from merge sort to quicksort. This drastically improved the time it took to sort all the moves and allowed the heuristic sorting to synergize well with the iterative deepening.
 
-___________________________________________________________________
+### Iterative Deepening (DeepeningPrunes) 
+With the restructuring of our code, we had to redo our Iterative Deepening for MiniMax. It is the same as before (relies on a time constraint to break out of MiniMax), but now has a Max Depth of 5 as we found it works better if it’s not over predicting.
 
-# Running the Referee and Playing the Game
+### DeepDelta Prunes
+Alone, our Iterative-Deepening and Heuristic Sort Agent weren’t able to defeat our Free-Choice Heuristic agent (SigmaPrunes V.2), however, once we combined our Sorting and Iterative Deepening agents into one, DeepDelta, we saw that DeepDelta began to beat SigmaPrunes V.2. We studied this by running multiple tests which we graphed out.
 
-Once python and dependencies are sorted, you can run the referee with 
+What we noticed is amongst our agents, the agent that went second had the advantage. However, whenever DeepDeltaPrunes went first it had a higher chance of tying than SigmaPrunes. On the other hand, SigmaPrunes which had a higher chance of losing if it went first. As a result, we ultimately chose DeepDeltaPrunes over SigmaPrunes. 
 
-`python referee.py <Player 1 name> <Player 2 name> --time_limit <time limit>`
-
-The Player 1 and 2 names are *single word names* for each of the agents.
-`--time_limit` is an optional argument that allows you to specify the time limit to play (in seconds).
-It defaults to 10 seconds. We will use 10 seconds in the competition. 
-This argument option is provide to allow easier debugging.
-
-The referee will create the files that it maintains in the same directory that the referee.py file is in.
-
-If you would like to just play the game, run
-
-`python game.py <Player 1 name> <Player 2 name>`
-
-and then you can play using the UI.
-
-You should not need to modify any of the code provided to you. 
-You are to write your owm program that can communicate with this referee.
-
-_________________________________________________________________________
-
-# Bugs
-
-Honestly, I fully expect there to be bugs in this code. If you for any reason suspect that 
-the referee is not behaving as described in the assignment on Canvas, please let us know in
-the `project-2-referee-bugs` channel in Slack. 
-
-## UPDATE TO V2 09/15/2022
-
-The first version of the referee did not produce a *end_game* file like it should.
-This version fixes that issue and updates the output messages to match the ones in Canvas.
-
-## UPDATE TO V3 09/20/2022
-
-The previous version of the referee did not filter out invalid initial moves.
-This version fixes that issue so the same move cannot be made twice.
-
-## UPDATE TO V4 09/20/2022
-
-The previous version of the referee used 'X' and 'O' in the first four moves
-file to indicate player moves; this is confusing because who is 'X' and who is
-'O' is randomly chosen and is
-not communicated to the players directly. To make communication easier for the
-players, the referee now uses the player names in the first_four_moves file.
-_________________________________________________________________________
-
-That is all! Have fun playing UTTT and finding fun ways to break my code...
-
-Will Babincsak
+Our results can be viewed in our attached charts. 
