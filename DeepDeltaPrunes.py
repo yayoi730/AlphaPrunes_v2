@@ -41,7 +41,7 @@ def main():
     startFlag = True
     while not exists("end_game"):  # checks if end game file exists, ends game if true
         time.sleep(1)
-        while not exists("DeepeningPrunes.go"):  # blocks the code from running unless it sees its: name.go
+        while not exists("DeepDeltaPrunes.go"):  # blocks the code from running unless it sees its: name.go
             pass
         time.sleep(0.1)
         if startFlag:  # if this is the start of the game
@@ -75,7 +75,7 @@ def read_moves(file):
         else:
             # populates matrices
             moves = line.split()
-            if moves[0] == 'DeepeningPrunes':
+            if moves[0] == 'DeepDeltaPrunes':
                 board[int(moves[1])][int(moves[2])] = Pnum
                 check_board_complete(int(moves[1]), complete_boards_list, board)
             else:
@@ -96,7 +96,7 @@ def add_move(next_move):
     file = open('move_file', 'r+')
     # read in the move from the other player here...
     file.seek(0)
-    file.write("DeepeningPrunes " + str(next_move[0]) + " " + str(next_move[1]))
+    file.write("DeepDeltaPrunes " + str(next_move[0]) + " " + str(next_move[1]))
     file.truncate()
     file.close()
     print("---------------------")
@@ -125,16 +125,14 @@ def minimax_starter(last_move):
     copy_board = np.copy(board, 'K').copy()
     copy_curr_list_c_boards = complete_boards_list.copy()
     # Calls minimax
-    # TODO: Implement Iterative Deepening over this w/ time_constraint
     start_time = time.time()
     best_move = None
     score = -math.inf
     depth = 1
-    while (time.time() - start_time) < (move_time+0.50) and depth < 5:
-        print("AT DEPTH: " + str(depth))
+    while (time.time() - start_time) < (move_time + 0.50) and depth < 5:
         try:
             best_move, score = minimax(copy_board, copy_curr_list_c_boards, last_move, depth, -math.inf, math.inf,
-                                          True, start_time)
+                                       True, start_time)
             depth += 1
         except TypeError:
             break
@@ -159,7 +157,6 @@ def minimax(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, ally,
         if depth == 0 or curr_list_c_boards.count(0) == 0:
             total_points_won = points_won(curr_board, curr_list_c_boards)
             return [last_move, total_points_won]
-        # TODO: implement time_constraint
         if ally:
             best_move, max_score = max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, not ally,
                                              start_time)
@@ -188,11 +185,10 @@ def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
     list_of_possible_moves, g_board = generate_list_of_moves(curr_board, curr_list_c_boards,
                                                              last_move)
 
-    # print("unsorted moves: " + str(list_of_possible_moves))
     sort_move_list(list_of_possible_moves, g_board, 0, len(list_of_possible_moves) - 1, curr_board,
-                       curr_list_c_boards, ally)
+                   curr_list_c_boards, ally)
     shave_move_list(list_of_possible_moves, 4)
-    # print("sorted moves: " + str(list_of_possible_moves))
+
 
     # EVALUATION OF MOVES
     max_score = -math.inf
@@ -205,7 +201,7 @@ def max_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
         # Calculate Min Scores Among Those Moves
         try:
             min_move, score = minimax(u_curr_board, u_curr_list_c_boards, chosen_move, depth - 1, alpha, beta, ally,
-                                  start_time)
+                                      start_time)
             # Find The Highest Score
             if score > max_score:
                 max_score = score
@@ -237,12 +233,10 @@ def min_value(curr_board, curr_list_c_boards, last_move, depth, alpha, beta, all
     # EVALUATION OF MOVES
     min_score = math.inf
 
-
-    print("unsorted moves: " + str(list_of_possible_moves))
     sort_move_list(list_of_possible_moves, g_board, 0, len(list_of_possible_moves) - 1, curr_board,
-                       curr_list_c_boards, ally)
+                   curr_list_c_boards, ally)
     shave_move_list(list_of_possible_moves, 4)
-    print("sorted moves: " + str(list_of_possible_moves))
+
 
     for move in list_of_possible_moves:
         chosen_move = [g_board, move]
@@ -315,8 +309,6 @@ def shave_move_list(sorted_moves_list, shave_num):
         for l in range(0, int(sorted_list_len / shave_num)):  # Gets rid of the worst fifth of the list
             sorted_moves_list.pop()
 
-# TODO: sort list of moves based on non-terminal utility function (use faster sort method, like Greedy(?))
-# TODO: remove undesirable moves from sorted list (how to determine this?
 def update_board(curr_board, curr_list_of_c_boards, last_move, ally):
     """
     Returns an updated board and list of completed boards given a move and bool representing who made it:
@@ -357,7 +349,6 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
                                n == 0]  # returns indices of all unpopulated grids within a g_board
         g_board = l_board
     else:
-        # TODO: FREE-CHOICE HEURISTIC FUNCTION
         # chooses board with 2 in a row, otherwise chooses first available
         unpopulated_boards = [x for x, n in enumerate(curr_list_of_c_boards) if
                               n == 0]  # returns indices of all unpopulated boards
@@ -371,6 +362,7 @@ def generate_list_of_moves(curr_board, curr_list_of_c_boards, last_move):
         possible_moves_list = [x for x, n in enumerate(all_local_moves) if
                                n == 0]  # returns indices of all unpopulated grids within chosen_board
     return [possible_moves_list, g_board]
+
 
 def board_heuristic(incomplete_boards, temp_board):
     point_sum = 0
@@ -417,6 +409,8 @@ def board_heuristic(incomplete_boards, temp_board):
     elif (np.fliplr(a).diagonal() == Enum).sum() == 2 and (np.fliplr(a).diagonal() == Pnum).sum() == 0:
         point_sum += 1
     return point_sum
+
+
 # Utility Functions:
 def points_won(temp_board, temp_list_of_comp_boards):
     """
